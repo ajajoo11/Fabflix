@@ -54,28 +54,24 @@
             let movieTableBodyElement = $("#movie_table_body");
 
             $.each(resultData, function (index, movie) {
+                let starsHtml = "";
+                let starsArray = movie.stars.split(", ");
+                $.each(starsArray, function (index, star) {
+                    starsHtml += '<a href="singlestar.html?id=' + encodeURIComponent(star) + '">' + star + '</a><br>';
+                });
+
                 let rowHtml = '<tr>' +
                     '<td><a href="singlemovie.html?id=' + encodeURIComponent(movie.title) + '">' + movie.title + '</a></td>' +
                     '<td>' + movie.year + '</td>' +
                     '<td>' + movie.director + '</td>' +
                     '<td>' + movie.genres + '</td>' +
-                    '<td>'; // Start of stars column
-
-                let starsArray = movie.stars.split(", ");
-                $.each(starsArray, function (index, star) {
-                    rowHtml += '<a href="singlestar.html?id=' + encodeURIComponent(star) + '">' + star + '</a><br>';
-                });
-
-                rowHtml += '</td>'; // End of stars column
-
-                rowHtml += '<td>' + movie.rating + '</td>' +
+                    '<td>' + starsHtml + '</td>' +
+                    '<td>' + movie.rating + '</td>' +
                     '</tr>';
 
                 movieTableBodyElement.append(rowHtml);
             });
         }
-
-
 
         function fetchMovieData() {
             $.ajax({
