@@ -52,9 +52,11 @@ public class singlemovieservlet extends HttpServlet {
         // connection after usage.
         try (Connection conn = dataSource.getConnection()) {
             // Construct a query to get movie information, genres, and stars
+            // Construct a query to get movie information, genres, stars' IDs, and stars'
+            // names
             String query = "SELECT m.title, m.year, m.director, " +
                     "GROUP_CONCAT(DISTINCT g.name ORDER BY g.name SEPARATOR ',') AS genres, " +
-                    "GROUP_CONCAT(DISTINCT s.name ORDER BY s.name SEPARATOR ',') AS stars, " +
+                    "GROUP_CONCAT(DISTINCT CONCAT(s.id, ':', s.name) ORDER BY s.name SEPARATOR ',') AS stars, " +
                     "r.rating " +
                     "FROM movies m " +
                     "LEFT JOIN ratings r ON m.id = r.movieId " +
@@ -83,15 +85,28 @@ public class singlemovieservlet extends HttpServlet {
                 int year = rs.getInt("year");
                 String director = rs.getString("director");
                 String genres = rs.getString("genres");
-                String stars = rs.getString("stars");
+                String starsString = rs.getString("stars");
                 float rating = rs.getFloat("rating");
+
+                // Populate movie information object
+                JsonArray starsArray = new JsonArray();
+                if (starsString != null) {
+                    String[] stars = starsString.split(",");
+                    for (String star : stars) {
+                        String[] starInfo = star.split(":");
+                        JsonObject starObject = new JsonObject();
+                        starObject.addProperty("id", starInfo[0]);
+                        starObject.addProperty("name", starInfo[1]);
+                        starsArray.add(starObject);
+                    }
+                }
 
                 // Populate movie information object
                 movieInfo.addProperty("title", title);
                 movieInfo.addProperty("year", year);
                 movieInfo.addProperty("director", director);
                 movieInfo.addProperty("genres", genres);
-                movieInfo.addProperty("stars", stars);
+                movieInfo.add("stars", starsArray);
                 movieInfo.addProperty("rating", rating);
             }
             rs.close();

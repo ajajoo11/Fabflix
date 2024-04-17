@@ -36,6 +36,13 @@
                 return decodeURIComponent(results[2].replace(/\+/g, " "));
             }
 
+            function createStarLinks(stars) {
+                var starLinks = stars.map(function (star) {
+                    return '<a href="starpage?id=' + star.id + '">' + star.name + '</a>';
+                }).join(', ');
+                return starLinks;
+            }
+
             // Function to fetch movie details from server based on movie id
             function fetchMovieDetails() {
                 var id = getParameterByName('id');
@@ -48,7 +55,7 @@
                             '<p><strong>Year:</strong> ' + data.year + '</p>' +
                             '<p><strong>Director:</strong> ' + data.director + '</p>' +
                             '<p><strong>Genres:</strong> ' + data.genres + '</p>' +
-                            '<p><strong>Stars:</strong> ' + data.stars + '</p>' +
+                            '<p><strong>Stars:</strong> ' + createStarLinks(data.stars) + '</p>' +
                             '<p><strong>Rating:</strong> ' + data.rating + '</p>';
                         $('#movie_details').html(movieDetailsHtml);
                     },
