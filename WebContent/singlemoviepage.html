@@ -42,7 +42,7 @@
                 $.ajax({
                     dataType: "json",
                     method: "GET",
-                    url: "singlemoviepage.html?id=" + encodeURIComponent(id),
+                    url: "singlemoviepage?id=" + encodeURIComponent(id),
                     success: function (data) {
                         var movieDetailsHtml = '<h2>' + data.title + '</h2>' +
                             '<p><strong>Year:</strong> ' + data.year + '</p>' +
