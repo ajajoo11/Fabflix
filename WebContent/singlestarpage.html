@@ -42,7 +42,7 @@
                 $.ajax({
                     dataType: "json",
                     method: "GET",
-                    url: "singlestar?id=" + encodeURIComponent(id),
+                    url: "singlestarpage?id=" + encodeURIComponent(id),
                     success: function (data) {
                         var starDetailsHtml = '<h2>' + data.name + '</h2>' +
                             '<p><strong>Year of Birth:</strong> ' + data.birthYear + '</p>' +

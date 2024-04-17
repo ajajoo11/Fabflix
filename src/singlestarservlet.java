@@ -143,7 +143,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-@WebServlet(name = "singlestarservlet", urlPatterns = "/singlestar")
+@WebServlet(name = "singlestarservlet", urlPatterns = "/singlestarpage")
 public class singlestarservlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private DataSource dataSource;
