@@ -143,7 +143,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-@WebServlet(name = "singlestarservlet", urlPatterns = "/single-star")
+@WebServlet(name = "singlestarservlet", urlPatterns = "/singlestar")
 public class singlestarservlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private DataSource dataSource;
@@ -160,7 +160,7 @@ public class singlestarservlet extends HttpServlet {
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
 
-        String starId = request.getParameter("starId");
+        String starId = request.getParameter("id");
 
         try (Connection conn = dataSource.getConnection()) {
             String query = "SELECT name, birthYear FROM stars WHERE id = ?";
