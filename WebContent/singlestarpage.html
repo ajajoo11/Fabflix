@@ -49,7 +49,7 @@
                             '<p><strong>Movies:</strong></p>' +
                             '<ul>';
                         data.movies.forEach(function (movie) {
-                            starDetailsHtml += '<li><a href="singlemoviepage?id=' + movie.id + '">' + movie.title + '</a></li>';
+                            starDetailsHtml += '<li><a href="singlemoviepage.html?id=' + movie.id + '">' + movie.title + '</a></li>';
                         });
                         starDetailsHtml += '</ul>';
                         $('#star_details').html(starDetailsHtml);
