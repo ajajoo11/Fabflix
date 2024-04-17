@@ -1,40 +1,3 @@
-<!--<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Single Star</title>
-</head>
-
-<body>
-    <h1>Star Information</h1>
-    <div id="starInfo"></div>
-
-    <script>
-        // Fetch data from the servlet and display star information
-        fetch('/api/single-star?id=<star_id>')
-            .then(response => response.json())
-            .then(data => {
-                const starInfo = document.getElementById('starInfo');
-                starInfo.innerHTML = `
-                    <p><strong>Name:</strong> ${data.star_name}</p>
-                    <p><strong>Year of Birth:</strong> ${data.star_dob}</p>
-                    <p><strong>Movies:</strong></p>
-                    <ul>
-                        ${data.movies.map(movie => `<li><a href="/single-movie?id=${movie.movie_id}">${movie.movie_title}</a></li>`).join('')}
-                    </ul>
-                `;
-            })
-            .catch(error => console.error('Error fetching star information:', error));
-    </script>
-
-
-
-</body>
-
-</html>""-->
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -42,37 +5,67 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Single Star</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 </head>
 
 <body>
-    <h1>Star Information</h1>
-    <div id="starInfo"></div>
+
+    <div class="container">
+        <h1 class="text-center mt-4 mb-5">Single Star</h1>
+
+        <div id="star_details">
+            <!-- Star details will be populated dynamically using JavaScript -->
+        </div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
 
     <script>
-        function fetchStarInfo(starId) {
-            fetch(`/single-star?starId=${starId}`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    const starInfo = document.getElementById('starInfo');
-                    starInfo.innerHTML = `
-                        <p><strong>Name:</strong> ${data.name}</p>
-                        <p><strong>Year of Birth:</strong> ${data.birthYear}</p>
-                        <p><strong>Movies:</strong></p>
-                        <ul>
-                            ${data.movies.map(movie => `<li><a href="/single-movie?id=${movie.id}">${movie.title}</a></li>`).join('')}
-                        </ul>
-                    `;
-                })
-                .catch(error => console.error('Error fetching star information:', error));
-        }
+        $(document).ready(function () {
+            // Function to extract query parameter from URL
+            function getParameterByName(name, url) {
+                if (!url) url = window.location.href;
+                name = name.replace(/[\[\]]/g, "\\$&");
+                var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+                    results = regex.exec(url);
+                if (!results) return null;
+                if (!results[2]) return '';
+                return decodeURIComponent(results[2].replace(/\+/g, " "));
+            }
 
-        fetchStarInfo('<star_id>');
+            // Function to fetch star details from server based on star id
+            function fetchStarDetails() {
+                var id = getParameterByName('id');
+                $.ajax({
+                    dataType: "json",
+                    method: "GET",
+                    url: "singlestar?id=" + encodeURIComponent(id),
+                    success: function (data) {
+                        var starDetailsHtml = '<h2>' + data.name + '</h2>' +
+                            '<p><strong>Year of Birth:</strong> ' + data.birthYear + '</p>' +
+                            '<p><strong>Movies:</strong></p>' +
+                            '<ul>';
+                        data.movies.forEach(function (movie) {
+                            starDetailsHtml += '<li><a href="singlemoviepage?id=' + movie.id + '">' + movie.title + '</a></li>';
+                        });
+                        starDetailsHtml += '</ul>';
+                        $('#star_details').html(starDetailsHtml);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("AJAX Error:", status, error);
+                        alert("Failed to fetch star details. Please try again later.");
+                    }
+                });
+            }
+
+            // Call fetchStarDetails when the page is ready
+            fetchStarDetails();
+        });
     </script>
+
 </body>
 
 </html>

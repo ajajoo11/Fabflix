@@ -38,7 +38,7 @@
 
             function createStarLinks(stars) {
                 var starLinks = stars.map(function (star) {
-                    return '<a href="starpage?id=' + star.id + '">' + star.name + '</a>';
+                    return '<a href="singlestar?id=' + star.id + '">' + star.name + '</a>';
                 }).join(', ');
                 return starLinks;
             }
