@@ -52,37 +52,16 @@ public class MoviesServlet extends HttpServlet {
 
             JsonArray jsonArray = new JsonArray();
             while (rs.next()) {
-                // Creating JsonObject for each movie...
-                JsonObject movieObject = new JsonObject();
+                JsonObject jsonObject = new JsonObject();
+                jsonObject.addProperty("title", rs.getString("title"));
+                jsonObject.addProperty("id", rs.getString("id"));
+                jsonObject.addProperty("year", rs.getInt("year"));
+                jsonObject.addProperty("director", rs.getString("director"));
+                jsonObject.addProperty("genres", rs.getString("genres"));
+                jsonObject.addProperty("stars", rs.getString("stars"));
+                jsonObject.addProperty("rating", rs.getDouble("rating"));
 
-                // Adding existing movie details
-                movieObject.addProperty("title", rs.getString("title"));
-                movieObject.addProperty("id", rs.getString("id"));
-                movieObject.addProperty("year", rs.getInt("year"));
-                movieObject.addProperty("director", rs.getString("director"));
-                movieObject.addProperty("genres", rs.getString("genres"));
-                String starsString = rs.getString("stars");
-                // movieObject.addProperty("stars", rs.getString("stars")); // Original stars
-                // property
-                movieObject.addProperty("rating", rs.getDouble("rating"));
-
-                // Parsing stars string and creating JsonArray for parsed stars
-                JsonArray starsArray = new JsonArray();
-                if (starsString != null) {
-                    String[] stars = starsString.split(",");
-                    for (String star : stars) {
-                        String[] starInfo = star.split(":");
-                        JsonObject starObject = new JsonObject();
-                        starObject.addProperty("id", starInfo[0]);
-                        starObject.addProperty("name", starInfo[1]);
-                        starsArray.add(starObject);
-                    }
-                }
-                // Adding parsed stars as a separate property
-                movieObject.add("stars", starsArray);
-
-                // Adding movie JsonObject to the jsonArray
-                jsonArray.add(movieObject);
+                jsonArray.add(jsonObject);
             }
             rs.close();
             statement.close();
