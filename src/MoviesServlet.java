@@ -34,7 +34,7 @@ public class MoviesServlet extends HttpServlet {
 
         try (Connection conn = dataSource.getConnection()) {
             Statement statement = conn.createStatement();
-            String query = "SELECT m.title, m.year, m.director, " +
+            String query = "SELECT m.id, m.title, m.year, m.director, " +
                     "GROUP_CONCAT(DISTINCT g.name ORDER BY g.name SEPARATOR ',') AS genres, " +
                     "GROUP_CONCAT(DISTINCT s.name ORDER BY s.name SEPARATOR ',') AS stars, " +
                     "r.rating " +
@@ -54,11 +54,13 @@ public class MoviesServlet extends HttpServlet {
             while (rs.next()) {
                 JsonObject jsonObject = new JsonObject();
                 jsonObject.addProperty("title", rs.getString("title"));
+                jsonObject.addProperty("id", rs.getString("id"));
                 jsonObject.addProperty("year", rs.getInt("year"));
                 jsonObject.addProperty("director", rs.getString("director"));
                 jsonObject.addProperty("genres", rs.getString("genres"));
                 jsonObject.addProperty("stars", rs.getString("stars"));
                 jsonObject.addProperty("rating", rs.getDouble("rating"));
+
 
                 jsonArray.add(jsonObject);
             }
