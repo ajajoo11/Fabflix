@@ -173,11 +173,7 @@ public class singlestarservlet extends HttpServlet {
             if (rs.next()) {
                 starJson.addProperty("name", rs.getString("name"));
                 int birthYear = rs.getInt("birthYear");
-                if (rs.wasNull()) {
-                    starJson.addProperty("birthYear", "N/A");
-                } else {
-                    starJson.addProperty("birthYear", birthYear);
-                }
+                starJson.addProperty("birthYear", birthYear);
 
                 query = "SELECT m.id, m.title FROM movies m JOIN stars_in_movies sm ON m.id = sm.movieId WHERE sm.starId = ?";
                 statement = conn.prepareStatement(query);
