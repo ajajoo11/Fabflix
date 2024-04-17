@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!--<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -28,6 +28,77 @@
             })
             .catch(error => console.error('Error fetching movie information:', error));
     </script>
+</body>
+
+</html>--->
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Single Movie</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+</head>
+
+<body>
+
+    <div class="container">
+        <h1 class="text-center mt-4 mb-5">Single Movie</h1>
+
+        <div id="movie_details">
+            <!-- Movie details will be populated dynamically using JavaScript -->
+        </div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Function to extract query parameter from URL
+            function getParameterByName(name, url) {
+                if (!url) url = window.location.href;
+                name = name.replace(/[\[\]]/g, "\\$&");
+                var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+                    results = regex.exec(url);
+                if (!results) return null;
+                if (!results[2]) return '';
+                return decodeURIComponent(results[2].replace(/\+/g, " "));
+            }
+
+            // Function to fetch movie details from server based on movie title
+            function fetchMovieDetails() {
+                var title = getParameterByName('title');
+                $.ajax({
+                    dataType: "json",
+                    method: "GET",
+                    url: "movieDetails?title=" + encodeURIComponent(title),
+                    success: function (data) {
+                        var movieDetailsHtml = '<h2>' + data.title + '</h2>' +
+                            '<p><strong>Year:</strong> ' + data.year + '</p>' +
+                            '<p><strong>Director:</strong> ' + data.director + '</p>' +
+                            '<p><strong>Genres:</strong> ' + data.genres + '</p>' +
+                            '<p><strong>Stars:</strong> ' + data.stars + '</p>' +
+                            '<p><strong>Rating:</strong> ' + data.rating + '</p>';
+                        $('#movie_details').html(movieDetailsHtml);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("AJAX Error:", status, error);
+                        alert("Failed to fetch movie details. Please try again later.");
+                    }
+                });
+            }
+
+            // Call fetchMovieDetails when the page is ready
+            fetchMovieDetails();
+        });
+    </script>
+
 </body>
 
 </html>
