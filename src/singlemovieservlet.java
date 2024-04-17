@@ -15,12 +15,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-// Declaring a WebServlet called SingleMovieServlet, which maps to url "/api/single-movie"
 @WebServlet(name = "singlemovieservlet", urlPatterns = "/singlemoviepage")
 public class singlemovieservlet extends HttpServlet {
     private static final long serialVersionUID = 3L;
 
-    // Create a dataSource which registered in web.xml
     private DataSource dataSource;
 
     public void init(ServletConfig config) {
@@ -37,15 +35,12 @@ public class singlemovieservlet extends HttpServlet {
      */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-        response.setContentType("application/json"); // Response mime type
+        response.setContentType("application/json");
 
-        // Retrieve parameter id from url request.
         String id = request.getParameter("id");
 
-        // The log message can be found in localhost log
         request.getServletContext().log("getting id: " + id);
 
-        // Output stream to STDOUT
         PrintWriter out = response.getWriter();
 
         // Get a connection from dataSource and let resource manager close the
