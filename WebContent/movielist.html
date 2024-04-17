@@ -58,14 +58,14 @@
                 let starsArray = movie.stars.split(", ");
                 for (let i = 0; i < starsArray.length; i++) {
                     let star = starsArray[i];
-                    starsHtml += '<a href="singlestar.html?id=' + encodeURIComponent(star) + '">' + star + '</a>';
+                    starsHtml += '<a href="singlestar.html?id=' + encodeURIComponent(star) + '">' + star + '</a> ';
                     if (i < starsArray.length - 1) {
                         starsHtml += '<br>'; // Add a line break if it's not the last star
                     }
                 }
 
                 let rowHtml = '<tr>' +
-                    '<td><a href="singlemovie.html?id=' + encodeURIComponent(movie.title) + '">' + movie.title + '</a></td>' +
+                    '<td><a href="singlemovie.html?id=' + encodeURIComponent(movie.id) + '">' + movie.id + '</a></td>' +
                     '<td>' + movie.year + '</td>' +
                     '<td>' + movie.director + '</td>' +
                     '<td>' + movie.genres + '</td>' +
