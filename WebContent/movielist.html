@@ -40,16 +40,17 @@
         function handleStarResult(resultData) {
             let movieTableBodyElement = $("#movie_table_body");
 
+            function createStarLinks(stars) {
+                var starLinks = stars.map(function (star) {
+                    return '<a href="singlestarpage.html?id=' + star.id + '">' + star.name + '</a>';
+                }).join(', ');
+                return starLinks;
+            }
+
+
             $.each(resultData, function (index, movie) {
-                let starsHtml = "";
-                let starsArray = movie.stars.split(", ");
-                for (let i = 0; i < starsArray.length; i++) {
-                    let star = starsArray[i];
-                    starsHtml += '<a href="singlestar.html?id=' + encodeURIComponent(star) + '">' + star + '</a> ';
-                    if (i < starsArray.length - 1) {
-                        starsHtml += '<br>'; // Add a line break if it's not the last star
-                    }
-                }
+                let starsHtml = createStarLinks(movie.stars);
+
 
                 let rowHtml = '<tr>' +
                     '<td><a href="singlemoviepage.html?id=' + encodeURIComponent(movie.id) + '">' + movie.title + '</a></td>' +
