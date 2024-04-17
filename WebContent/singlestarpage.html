@@ -15,7 +15,7 @@
         <h1 class="text-center mt-4 mb-5">Single Star</h1>
 
         <div id="star_details">
-            <!-- Star details will be populated dynamically using JavaScript -->
+
         </div>
     </div>
 
@@ -25,7 +25,7 @@
 
     <script>
         $(document).ready(function () {
-            // Function to extract query parameter from URL
+
             function getParameterByName(name, url) {
                 if (!url) url = window.location.href;
                 name = name.replace(/[\[\]]/g, "\\$&");
@@ -36,7 +36,7 @@
                 return decodeURIComponent(results[2].replace(/\+/g, " "));
             }
 
-            // Function to fetch star details from server based on star id
+
             function fetchStarDetails() {
                 var id = getParameterByName('id');
                 $.ajax({

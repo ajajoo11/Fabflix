@@ -17,7 +17,7 @@
         <h1 class="text-center mt-4 mb-5">Single Movie</h1>
 
         <div id="movie_details">
-            <!-- Movie details will be populated dynamically using JavaScript -->
+
         </div>
     </div>
 
@@ -27,7 +27,7 @@
 
     <script>
         $(document).ready(function () {
-            // Function to extract query parameter from URL
+
             function getParameterByName(name, url) {
                 if (!url) url = window.location.href;
                 name = name.replace(/[\[\]]/g, "\\$&");
@@ -45,7 +45,7 @@
                 return starLinks;
             }
 
-            // Function to fetch movie details from server based on movie id
+
             function fetchMovieDetails() {
                 var id = getParameterByName('id');
                 $.ajax({
@@ -68,7 +68,7 @@
                 });
             }
 
-            // Call fetchMovieDetails when the page is ready
+
             fetchMovieDetails();
         });
     </script>
