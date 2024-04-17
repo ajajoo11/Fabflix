@@ -42,7 +42,7 @@
                 $.ajax({
                     dataType: "json",
                     method: "GET",
-                    url: "singlemovie.html?id=" + encodeURIComponent(id),
+                    url: "singlemoviepage.html?id=" + encodeURIComponent(id),
                     success: function (data) {
                         var movieDetailsHtml = '<h2>' + data.title + '</h2>' +
                             '<p><strong>Year:</strong> ' + data.year + '</p>' +
@@ -50,7 +50,7 @@
                             '<p><strong>Genres:</strong> ' + data.genres + '</p>' +
                             '<p><strong>Stars:</strong> ' + data.stars + '</p>' +
                             '<p><strong>Rating:</strong> ' + data.rating + '</p>';
-                        $('#movie_details').html(movieDetailsHtml);
+                        $('#singlemoviepage').html(movieDetailsHtml);
                     },
                     error: function (xhr, status, error) {
                         console.error("AJAX Error:", status, error);
