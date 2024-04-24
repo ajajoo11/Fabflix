@@ -13,6 +13,28 @@
 <body>
 
     <div class="container">
+        <!-- Search form -->
+        <form id="searchForm" class="form-inline justify-content-center mb-4">
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" id="titleCheckbox" value="title">
+                <label class="form-check-label" for="titleCheckbox">Title</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" id="yearCheckbox" value="year">
+                <label class="form-check-label" for="yearCheckbox">Year</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" id="directorCheckbox" value="director">
+                <label class="form-check-label" for="directorCheckbox">Director</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" id="starCheckbox" value="star">
+                <label class="form-check-label" for="starCheckbox">Star's Name</label>
+            </div>
+            <input id="searchInput" type="text" class="form-control mr-sm-2" placeholder="Search movies...">
+            <button id="searchButton" type="submit" class="btn btn-primary">Search</button>
+        </form>
+
         <h1 class="text-center mt-4 mb-5">Browse by Genre</h1>
 
         <ul id="genreList" class="list-group">
@@ -46,49 +68,87 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
 
     <script>
-        function displayGenres(genres) {
-            let genreListElement = $("#genreList");
-            genreListElement.empty();
-
-            $.each(genres, function (index, genre) {
-                let listItem = $('<li class="list-group-item"></li>');
-                let genreLink = $('<a></a>').text(genre.name).attr('href', 'singlegenrepage.html?id=' + encodeURIComponent(genre.id));
-                listItem.append(genreLink);
-                genreListElement.append(listItem);
-            });
-        }
-
-        function displayAlphabetLinks() {
-            let alphabetLinksElement = $("#alphabetRow");
-            alphabetLinksElement.empty();
-
-            for (let charCode = 65; charCode <= 90; charCode++) {
-                let letter = String.fromCharCode(charCode);
-                let alphabetLink = $('<a class="mx-2"></a>').text(letter).attr('href', 'moviesbyalphanum.html?charac=' + encodeURIComponent(letter));
-                alphabetLinksElement.append(alphabetLink);
-            }
-        }
-
-        function displayNumberLinks() {
-            let numberLinksElement = $("#numberRow");
-            numberLinksElement.empty();
-
-            for (let digit = 0; digit <= 9; digit++) {
-                let numberLink = $('<a class="mx-2"></a>').text(digit).attr('href', 'moviesbyalphanum.html?charac=' + encodeURIComponent(digit));
-                numberLinksElement.append(numberLink);
-            }
-        }
-
-        function displaySpecialCharLinks() {
-            let specialCharLinksElement = $("#specialCharRow");
-            specialCharLinksElement.empty();
-
-            let specialChar = '*';
-            let specialCharLink = $('<a class="mx-2"></a>').text(specialChar).attr('href', 'moviesbyalphanum.html?charac=' + encodeURIComponent(specialChar));
-            specialCharLinksElement.append(specialCharLink);
-        }
-
         $(document).ready(function () {
+            // Function to display genres
+            function displayGenres(genres) {
+                let genreListElement = $("#genreList");
+                genreListElement.empty();
+
+                $.each(genres, function (index, genre) {
+                    let listItem = $('<li class="list-group-item"></li>');
+                    let genreLink = $('<a></a>').text(genre.name).attr('href', 'singlegenrepage.html?id=' + encodeURIComponent(genre.id));
+                    listItem.append(genreLink);
+                    genreListElement.append(listItem);
+                });
+            }
+
+            // Function to display alphabet links
+            function displayAlphabetLinks() {
+                let alphabetLinksElement = $("#alphabetRow");
+                alphabetLinksElement.empty();
+
+                for (let charCode = 65; charCode <= 90; charCode++) {
+                    let letter = String.fromCharCode(charCode);
+                    let alphabetLink = $('<a class="mx-2"></a>').text(letter).attr('href', 'moviesbyalphanum.html?charac=' + encodeURIComponent(letter));
+                    alphabetLinksElement.append(alphabetLink);
+                }
+            }
+
+            // Function to display number links
+            function displayNumberLinks() {
+                let numberLinksElement = $("#numberRow");
+                numberLinksElement.empty();
+
+                for (let digit = 0; digit <= 9; digit++) {
+                    let numberLink = $('<a class="mx-2"></a>').text(digit).attr('href', 'moviesbyalphanum.html?charac=' + encodeURIComponent(digit));
+                    numberLinksElement.append(numberLink);
+                }
+            }
+
+            // Function to display special character link
+            function displaySpecialCharLink() {
+                let specialCharLinksElement = $("#specialCharRow");
+                specialCharLinksElement.empty();
+
+                let specialChar = '*';
+                let specialCharLink = $('<a class="mx-2"></a>').text(specialChar).attr('href', 'moviesbyalphanum.html?charac=' + encodeURIComponent(specialChar));
+                specialCharLinksElement.append(specialCharLink);
+            }
+
+            // Function to perform the search
+            function performSearch(searchTerm, searchCriteria) {
+                // Perform AJAX request to fetch search results
+                $.ajax({
+                    url: "search",
+                    method: "GET",
+                    data: { query: searchTerm, criteria: searchCriteria }, // Pass search query and criteria to server
+                    dataType: "json",
+                    success: function (data) {
+                        // Process search results (e.g., display them)
+                        // Implement your logic here to display search results
+                        console.log("Search results:", data);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error fetching search results:", status, error);
+                        alert("Failed to fetch search results. Please try again later.");
+                    }
+                });
+            }
+
+            // Handle form submission for search
+            $("#searchForm").submit(function (event) {
+                event.preventDefault(); // Prevent default form submission
+                let searchTerm = $("#searchInput").val().trim(); // Get search term
+                let searchCriteria = [];
+                $("input[type=checkbox]:checked").each(function () {
+                    searchCriteria.push($(this).val());
+                });
+                if (searchTerm !== "" && searchCriteria.length > 0) {
+                    performSearch(searchTerm, searchCriteria); // Perform the search
+                }
+            });
+
+            // Load genres, alphabet links, number links, and special char link
             $.ajax({
                 url: "genres",
                 method: "GET",
@@ -104,7 +164,7 @@
 
             displayAlphabetLinks();
             displayNumberLinks();
-            displaySpecialCharLinks();
+            displaySpecialCharLink();
         });
     </script>
 
