@@ -37,7 +37,8 @@ public class LoginServlet extends HttpServlet {
         boolean isValidUser = false;
 
         try (Connection dbCon = dataSource.getConnection();
-             PreparedStatement statement = dbCon.prepareStatement("SELECT * FROM customers WHERE email = ? AND password = ?")) {
+                PreparedStatement statement = dbCon
+                        .prepareStatement("SELECT * FROM customers WHERE email = ? AND password = ?")) {
 
             statement.setString(1, email);
             statement.setString(2, password);
@@ -71,7 +72,7 @@ public class LoginServlet extends HttpServlet {
             response.setCharacterEncoding("UTF-8");
             response.getWriter().write("{\"message\": \"Credentials verified\"}");
 
-            response.sendRedirect("search.html"); // Redirect to the main page
+            response.sendRedirect("searchandbrowsepage.html"); // Redirect to the main page
         } else {
             request.setAttribute("loginError", "Invalid email or password.");
             request.getRequestDispatcher("login.html").forward(request, response);

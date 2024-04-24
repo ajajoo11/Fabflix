@@ -5,7 +5,6 @@
     <display-name>Project-2</display-name>
     <welcome-file-list>
         <welcome-file>login.html</welcome-file>
-        <welcome-file>search.html</welcome-file>
     </welcome-file-list>
 
     <!-- Register the DataSource which defined in META-INF/context.xml-->

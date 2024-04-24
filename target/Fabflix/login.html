@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Login to Fabflix</title>
@@ -20,7 +21,7 @@
                     if (response.ok) {
                         alert('Credentials verified!');
                         // window.location.href = response.url;
-                        window.location.href = '/Fabflix/search.html'
+                        window.location.href = '/Fabflix/searchandbrowsepage.html'
                     } else {
                         return response.text();
                     }
@@ -46,21 +47,23 @@
     </script>
 
 </head>
+
 <body>
-<h2>Welcome to Fabflix</h2>
-<form id="loginForm"  action="/login" method="post" onsubmit="handleLogin(event)" novalidate>
-    <div>
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required>
-    </div>
-    <div>
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required>
-    </div>
-    <div>
-        <button type="submit">Login</button>
-    </div>
-    <div id="loginError" style="color: red;"></div>
-</form>
+    <h2>Welcome to Fabflix</h2>
+    <form id="loginForm" action="/login" method="post" onsubmit="handleLogin(event)" novalidate>
+        <div>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        <div>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <div>
+            <button type="submit">Login</button>
+        </div>
+        <div id="loginError" style="color: red;"></div>
+    </form>
 </body>
+
 </html>
