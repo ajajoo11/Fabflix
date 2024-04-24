@@ -57,8 +57,6 @@
                 dataType: 'json',
                 success: function (movies) {
                     var genreMovies = $('#genreMovies');
-
-
                     var tbody = $('#moviesTable tbody');
                     $.each(movies, function (index, movie) {
                         var row = $('<tr>');
