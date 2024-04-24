@@ -7,30 +7,16 @@
     <title>Movies by Genre</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
         integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <link rel="stylesheet" type="text/css" href="css/style.css">
 </head>
 
 <body>
 
-    <div class="container">
-        <h1 class="text-center mt-4 mb-5">Movies by Genre</h1>
+    <div class="container mt-5">
+        <h1 class="text-center mb-5">Movies by Genre</h1>
 
-        <div id="genreMovies" class="mb-4">
-            <!-- Genre name will be dynamically added here -->
+        <div class="row" id="genreMovies">
+            <!-- Genre cards will be dynamically added here -->
         </div>
-
-        <table id="moviesTable" class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Year</th>
-                    <th>Director</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Movies will be dynamically added here -->
-            </tbody>
-        </table>
     </div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
@@ -57,14 +43,18 @@
                 dataType: 'json',
                 success: function (movies) {
                     var genreMovies = $('#genreMovies');
-                    var tbody = $('#moviesTable tbody');
                     $.each(movies, function (index, movie) {
-                        var row = $('<tr>');
+                        var col = $('<div class="col-md-4 mb-4">');
+                        var card = $('<div class="card">');
+                        var cardBody = $('<div class="card-body">');
                         var titleLink = $('<a>').attr('href', 'singlemoviepage.html?id=' + encodeURIComponent(movie.id)).text(movie.title);
-                        row.append($('<td>').append(titleLink));
-                        row.append($('<td>').text(movie.year));
-                        row.append($('<td>').text(movie.director));
-                        tbody.append(row);
+                        var year = $('<p class="card-text">').text('Year: ' + movie.year);
+                        var director = $('<p class="card-text">').text('Director: ' + movie.director);
+
+                        cardBody.append(titleLink, year, director);
+                        card.append(cardBody);
+                        col.append(card);
+                        genreMovies.append(col);
                     });
                 },
                 error: function (xhr, status, error) {

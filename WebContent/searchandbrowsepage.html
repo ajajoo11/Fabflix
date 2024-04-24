@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <title>Fabflix</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
         integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="css/style.css">
@@ -64,7 +64,7 @@
 
             for (let charCode = 65; charCode <= 90; charCode++) {
                 let letter = String.fromCharCode(charCode);
-                let alphabetLink = $('<a class="mx-2"></a>').text(letter).attr('href', '#');
+                let alphabetLink = $('<a class="mx-2"></a>').text(letter).attr('href', 'moviesbyalphanum.html?charac=' + encodeURIComponent(letter));
                 alphabetLinksElement.append(alphabetLink);
             }
         }
@@ -74,7 +74,7 @@
             numberLinksElement.empty();
 
             for (let digit = 0; digit <= 9; digit++) {
-                let numberLink = $('<a class="mx-2"></a>').text(digit).attr('href', '#');
+                let numberLink = $('<a class="mx-2"></a>').text(digit).attr('href', 'moviesbyalphanum.html?charac=' + encodeURIComponent(digit));
                 numberLinksElement.append(numberLink);
             }
         }
@@ -83,11 +83,9 @@
             let specialCharLinksElement = $("#specialCharRow");
             specialCharLinksElement.empty();
 
-            let specialChars = ['*', '@', '#', '$', '%', '&', '!'];
-            $.each(specialChars, function (index, char) {
-                let specialCharLink = $('<a class="mx-2"></a>').text(char).attr('href', '#');
-                specialCharLinksElement.append(specialCharLink);
-            });
+            let specialChar = '*';
+            let specialCharLink = $('<a class="mx-2"></a>').text(specialChar).attr('href', 'moviesbyalphanum.html?charac=' + encodeURIComponent(specialChar));
+            specialCharLinksElement.append(specialCharLink);
         }
 
         $(document).ready(function () {

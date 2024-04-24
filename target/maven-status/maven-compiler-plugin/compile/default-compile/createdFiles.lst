@@ -3,5 +3,6 @@ singlegenreservlet.class
 singlestarservlet.class
 LoginServlet.class
 searchandbrowseservlet.class
+moviesbyalphanumservlet.class
 singlemovieservlet.class
 MoviesServlet.class
