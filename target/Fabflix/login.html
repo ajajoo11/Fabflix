@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login to Fabflix</title>
+    <script>
+        function handleLogin(event) {
+            event.preventDefault();
+            var form = document.getElementById('loginForm');
+            var formData = new FormData(form);
+
+            var contextPath = getContextPath(); // Get the context path dynamically
+
+            fetch('/Fabflix', { // Construct the URL using the context path
+                method: 'POST',
+                body: formData
+            })
+                .then(response => {
+                    console.log(response); // Log the response object to the console
+                    if (response.ok) {
+                        alert('Credentials verified!');
+                        // window.location.href = response.url;
+                        window.location.href = '/Fabflix/search.html'
+                    } else {
+                        return response.text();
+                    }
+                })
+                .then(text => {
+                    // Handle any messages sent by the servlet
+                    if (text) {
+                        document.getElementById('loginError').innerText = text;
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('loginError').innerText = error.message;
+                });
+        }
+
+        function getContextPath() {
+            var pathArray = window.location.pathname.split('/');
+            // Correct the context path retrieval logic if necessary
+            var contextPath = "/" + pathArray[1];
+            return contextPath;
+        }
+
+    </script>
+
+</head>
+<body>
+<h2>Welcome to Fabflix</h2>
+<form id="loginForm"  action="/login" method="post" onsubmit="handleLogin(event)" novalidate>
+    <div>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+    </div>
+    <div>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+    </div>
+    <div>
+        <button type="submit">Login</button>
+    </div>
+    <div id="loginError" style="color: red;"></div>
+</form>
+</body>
+</html>

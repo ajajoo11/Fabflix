@@ -2,9 +2,10 @@
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://xmlns.jcp.org/xml/ns/javaee"
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
          version="3.1">
-    <display-name>Project-1</display-name>
+    <display-name>Project-2</display-name>
     <welcome-file-list>
-        <welcome-file>movielist.html</welcome-file>
+        <welcome-file>login.html</welcome-file>
+        <welcome-file>search.html</welcome-file>
     </welcome-file-list>
 
     <!-- Register the DataSource which defined in META-INF/context.xml-->
