@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <title>Fabflix</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
         integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="css/style.css">
@@ -13,6 +13,28 @@
 <body>
 
     <div class="container">
+        <!-- Search form -->
+        <form id="searchForm" class="form-inline justify-content-center mb-4">
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" id="titleCheckbox" value="title">
+                <label class="form-check-label" for="titleCheckbox">Title</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" id="yearCheckbox" value="year">
+                <label class="form-check-label" for="yearCheckbox">Year</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" id="directorCheckbox" value="director">
+                <label class="form-check-label" for="directorCheckbox">Director</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" id="starCheckbox" value="star">
+                <label class="form-check-label" for="starCheckbox">Star's Name</label>
+            </div>
+            <input id="searchInput" type="text" class="form-control mr-sm-2" placeholder="Search movies...">
+            <button id="searchButton" type="submit" class="btn btn-primary">Search</button>
+        </form>
+
         <h1 class="text-center mt-4 mb-5">Browse by Genre</h1>
 
         <ul id="genreList" class="list-group">
@@ -46,51 +68,66 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
 
     <script>
-        function displayGenres(genres) {
-            let genreListElement = $("#genreList");
-            genreListElement.empty();
-
-            $.each(genres, function (index, genre) {
-                let listItem = $('<li class="list-group-item"></li>');
-                let genreLink = $('<a></a>').text(genre.name).attr('href', 'singlegenrepage.html?id=' + encodeURIComponent(genre.id));
-                listItem.append(genreLink);
-                genreListElement.append(listItem);
-            });
-        }
-
-        function displayAlphabetLinks() {
-            let alphabetLinksElement = $("#alphabetRow");
-            alphabetLinksElement.empty();
-
-            for (let charCode = 65; charCode <= 90; charCode++) {
-                let letter = String.fromCharCode(charCode);
-                let alphabetLink = $('<a class="mx-2"></a>').text(letter).attr('href', '#');
-                alphabetLinksElement.append(alphabetLink);
-            }
-        }
-
-        function displayNumberLinks() {
-            let numberLinksElement = $("#numberRow");
-            numberLinksElement.empty();
-
-            for (let digit = 0; digit <= 9; digit++) {
-                let numberLink = $('<a class="mx-2"></a>').text(digit).attr('href', '#');
-                numberLinksElement.append(numberLink);
-            }
-        }
-
-        function displaySpecialCharLinks() {
-            let specialCharLinksElement = $("#specialCharRow");
-            specialCharLinksElement.empty();
-
-            let specialChars = ['*', '@', '#', '$', '%', '&', '!'];
-            $.each(specialChars, function (index, char) {
-                let specialCharLink = $('<a class="mx-2"></a>').text(char).attr('href', '#');
-                specialCharLinksElement.append(specialCharLink);
-            });
-        }
-
         $(document).ready(function () {
+            function displayGenres(genres) {
+                let genreListElement = $("#genreList");
+                genreListElement.empty();
+
+                $.each(genres, function (index, genre) {
+                    let listItem = $('<li class="list-group-item"></li>');
+                    let genreLink = $('<a></a>').text(genre.name).attr('href', 'singlegenrepage.html?id=' + encodeURIComponent(genre.id));
+                    listItem.append(genreLink);
+                    genreListElement.append(listItem);
+                });
+            }
+
+            function displayAlphabetLinks() {
+                let alphabetLinksElement = $("#alphabetRow");
+                alphabetLinksElement.empty();
+
+                for (let charCode = 65; charCode <= 90; charCode++) {
+                    let letter = String.fromCharCode(charCode);
+                    let alphabetLink = $('<a class="mx-2"></a>').text(letter).attr('href', 'moviesbyalphanum.html?charac=' + encodeURIComponent(letter));
+                    alphabetLinksElement.append(alphabetLink);
+                }
+            }
+
+            function displayNumberLinks() {
+                let numberLinksElement = $("#numberRow");
+                numberLinksElement.empty();
+
+                for (let digit = 0; digit <= 9; digit++) {
+                    let numberLink = $('<a class="mx-2"></a>').text(digit).attr('href', 'moviesbyalphanum.html?charac=' + encodeURIComponent(digit));
+                    numberLinksElement.append(numberLink);
+                }
+            }
+
+            function displaySpecialCharLink() {
+                let specialCharLinksElement = $("#specialCharRow");
+                specialCharLinksElement.empty();
+
+                let specialChar = '*';
+                let specialCharLink = $('<a class="mx-2"></a>').text(specialChar).attr('href', 'moviesbyalphanum.html?charac=' + encodeURIComponent(specialChar));
+                specialCharLinksElement.append(specialCharLink);
+            }
+
+            function redirectToSearchResults(searchTerm, searchCriteria) {
+                let url = "searchresults.html?query=" + encodeURIComponent(searchTerm) + "&criteria=" + encodeURIComponent(searchCriteria.join(","));
+                window.location.href = url;
+            }
+
+            $("#searchForm").submit(function (event) {
+                event.preventDefault();
+                let searchTerm = $("#searchInput").val().trim();
+                let searchCriteria = [];
+                $("input[type=checkbox]:checked").each(function () {
+                    searchCriteria.push($(this).val());
+                });
+                if (searchTerm !== "" && searchCriteria.length > 0) {
+                    redirectToSearchResults(searchTerm, searchCriteria);
+                }
+            });
+
             $.ajax({
                 url: "genres",
                 method: "GET",
@@ -106,7 +143,7 @@
 
             displayAlphabetLinks();
             displayNumberLinks();
-            displaySpecialCharLinks();
+            displaySpecialCharLink();
         });
     </script>
 

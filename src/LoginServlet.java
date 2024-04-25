@@ -15,7 +15,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.io.*;
 import java.util.Objects;
+import java.io.*;
+import java.util.Objects;
 
+@WebServlet(name = "LoginServlet", urlPatterns = "/Fabflix")
 @WebServlet(name = "LoginServlet", urlPatterns = "/Fabflix")
 public class LoginServlet extends HttpServlet {
 
@@ -32,9 +35,11 @@ public class LoginServlet extends HttpServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
         PrintWriter out = response.getWriter();
+        PrintWriter out = response.getWriter();
 
         String email = request.getParameter("email");
         String password = request.getParameter("password");
+        System.out.println("Authenticating user: " + email); // Debug print
         System.out.println("Authenticating user: " + email); // Debug print
 
         boolean isValidUser = false;
@@ -49,6 +54,7 @@ public class LoginServlet extends HttpServlet {
             ResultSet rs = statement.executeQuery();
 
             if (rs.next()) {
+                out.println("User authenticated."); // Debug print
                 out.println("User authenticated."); // Debug print
                 isValidUser = true;
                 // HttpSession session = request.getSession();
@@ -79,6 +85,23 @@ public class LoginServlet extends HttpServlet {
 //                response.setCharacterEncoding("UTF-8");
 //                response.getWriter().write("{\"error\": \"Invalid email or password.\"}");
 //                return;
+                HttpSession session = request.getSession();
+                response.sendRedirect("/Fabflix/searchandbrowsepage.html");
+                // session.setAttribute("customer", new Customer(
+                // rs.getInt("id"),
+                // rs.getString("firstName"),
+                // rs.getString("lastName"),
+                // rs.getString("ccId"),
+                // rs.getString("address"),
+                // rs.getString("email"),
+                // rs.getString("password")));
+            } else {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // Set response status to 401 Unauthorized
+                out.println("Authentication failed."); // Debug print
+                response.sendRedirect("/Fabflix/login.html");
+                // out.println("<html><body><h2>Error: Invalid email or
+                // password</h2></body></html>");
+                // response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             }
             rs.close();
 
@@ -95,6 +118,14 @@ public class LoginServlet extends HttpServlet {
 //            request.setAttribute("loginError", "Invalid email or password.");
 //            request.getRequestDispatcher("login.html").forward(request, response);
 //        }
+        //
+        // if (isValidUser) {
+        // response.sendRedirect("searchandbrowsepage.html");
+        // } else {
+        // response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        // request.setAttribute("loginError", "Invalid email or password.");
+        // request.getRequestDispatcher("login.html").forward(request, response);
+        // }
     }
 
 }

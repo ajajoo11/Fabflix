@@ -16,7 +16,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 @WebServlet(name = "singlegenreservlet", urlPatterns = "/singlegenrepage")
 public class singlegenreservlet extends HttpServlet {
@@ -41,10 +40,12 @@ public class singlegenreservlet extends HttpServlet {
         }
 
         try (Connection connection = dataSource.getConnection()) {
-            String query = "SELECT m.id, m.title, m.year, m.director " +
+            String query = "SELECT m.id, m.title, m.year, m.director, r.rating " +
                     "FROM movies m " +
                     "JOIN genres_in_movies gim ON m.id = gim.movieId " +
-                    "WHERE gim.genreId = ?";
+                    "LEFT JOIN ratings r ON m.id = r.movieId " +
+                    "WHERE gim.genreId = ?" +
+                    "ORDER BY r.rating DESC";
             try (PreparedStatement statement = connection.prepareStatement(query)) {
                 statement.setString(1, genreId);
                 try (ResultSet resultSet = statement.executeQuery()) {
@@ -55,6 +56,7 @@ public class singlegenreservlet extends HttpServlet {
                         movieObject.addProperty("year", resultSet.getInt("year"));
                         movieObject.addProperty("director", resultSet.getString("director"));
                         movieObject.addProperty("id", resultSet.getString("id"));
+                        movieObject.addProperty("rating", resultSet.getFloat("rating"));
 
                         moviesArray.add(movieObject);
                     }
