@@ -6,45 +6,65 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Movies by Genre</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="css/moviepage.css">
 </head>
 
 <body>
 
-    <div class="container mt-5">
-        <h1 class="text-center mb-5">Movies by Genre</h1>
+<div class="container mt-5">
+    <h1 class="text-center mb-5">Movies by Genre</h1>
 
-        <div class="row" id="genreMovies">
-            <!-- Genre cards will be dynamically added here -->
+    <!-- Sorting options -->
+    <div class="row mb-3">
+        <div class="col-md-12">
+            <label for="sort_option">Sort by:</label>
+            <select class="form-control" id="sort_option">
+                <option value="title_asc_rating_desc">Title (Increasing) - Rating (Decreasing)</option>
+                <option value="title_asc_rating_asc">Title (Increasing) - Rating (Increasing)</option>
+                <option value="title_desc_rating_desc">Title (Decreasing) - Rating (Decreasing)</option>
+                <option value="title_desc_rating_asc">Title (Decreasing) - Rating (Increasing)</option>
+                <option value="rating_asc_title_desc">Rating (Increasing) - Title (Decreasing)</option>
+                <option value="rating_asc_title_asc">Rating (Increasing) - Title (Increasing)</option>
+                <option value="rating_desc_title_desc">Rating (Decreasing) - Title (Decreasing)</option>
+                <option value="rating_desc_title_asc">Rating (Decreasing) - Title (Increasing)</option>
+            </select>
         </div>
     </div>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <div class="row" id="genreMovies">
+        <!-- Genre cards will be dynamically added here -->
+    </div>
+</div>
 
-    <script>
-        $(document).ready(function () {
-            // Function to parse URL query parameters
-            function getUrlParameter(name) {
-                name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
-                var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
-                var results = regex.exec(location.search);
-                return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
-            };
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
 
-            // Get genre ID from URL query parameter
+<script>
+    $(document).ready(function () {
+        // Function to parse URL query parameters
+        function getUrlParameter(name) {
+            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+            var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+            var results = regex.exec(location.search);
+            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+        };
+
+        // Function to fetch movies by genre with sorting parameters
+        function fetchMoviesByGenre(sortOption) {
             var genreId = getUrlParameter('id');
 
-            // Fetch movies by genre from the server
             $.ajax({
-                url: 'singlegenrepage?id=' + genreId,
+                url: 'singlegenrepage?id=' + genreId + '&sort_option=' + sortOption,
                 method: 'GET',
                 dataType: 'json',
                 success: function (movies) {
                     var genreMovies = $('#genreMovies');
+                    genreMovies.empty(); // Clear existing movie cards
+
                     $.each(movies, function (index, movie) {
+                        // Create movie card and append to genreMovies
                         var col = $('<div class="col-md-4 mb-4">');
                         var card = $('<div class="card">');
                         var cardBody = $('<div class="card-body">');
@@ -52,7 +72,6 @@
                         var director = $("<p class='card-text'>Director: " + movie.director + "</p>");
                         var year = $("<p class='card-text'>Year: " + movie.year + "</p>");
                         var rating = $("<p class='card-text'>Rating: " + movie.rating + "</p>");
-
 
                         cardBody.append(titleLink, director, year, rating);
                         card.append(cardBody);
@@ -65,8 +84,18 @@
                     alert('Failed to fetch movies by genre. Please try again later.');
                 }
             });
+        }
+
+        // Event listener for sorting options change
+        $('#sort_option').change(function () {
+            var sortOption = $('#sort_option').val();
+            fetchMoviesByGenre(sortOption); // Fetch movies with selected sorting parameters
         });
-    </script>
+
+        // Fetch movies by genre with default sorting parameters on page load
+        fetchMoviesByGenre('title_asc_rating_desc');
+    });
+</script>
 
 </body>
 

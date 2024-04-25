@@ -34,7 +34,9 @@ public class singlegenreservlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String genreId = request.getParameter("id");
-        if (genreId == null || genreId.isEmpty()) {
+        String sortOption = request.getParameter("sort_option");
+
+        if (genreId == null || genreId.isEmpty() || sortOption == null || sortOption.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
@@ -44,8 +46,40 @@ public class singlegenreservlet extends HttpServlet {
                     "FROM movies m " +
                     "JOIN genres_in_movies gim ON m.id = gim.movieId " +
                     "LEFT JOIN ratings r ON m.id = r.movieId " +
-                    "WHERE gim.genreId = ?" +
-                    "ORDER BY r.rating DESC";
+                    "WHERE gim.genreId = ? " +
+                    "ORDER BY ";
+
+            switch (sortOption) {
+                case "title_asc_rating_desc":
+                    query += "m.title ASC, r.rating DESC";
+                    break;
+                case "title_asc_rating_asc":
+                    query += "m.title ASC, r.rating ASC";
+                    break;
+                case "title_desc_rating_desc":
+                    query += "m.title DESC, r.rating DESC";
+                    break;
+                case "title_desc_rating_asc":
+                    query += "m.title DESC, r.rating ASC";
+                    break;
+                case "rating_asc_title_desc":
+                    query += "r.rating ASC, m.title DESC";
+                    break;
+                case "rating_asc_title_asc":
+                    query += "r.rating ASC, m.title ASC";
+                    break;
+                case "rating_desc_title_desc":
+                    query += "r.rating DESC, m.title DESC";
+                    break;
+                case "rating_desc_title_asc":
+                    query += "r.rating DESC, m.title ASC";
+                    break;
+                default:
+                    // Default sorting by title ascending, rating descending
+                    query += "m.title ASC, r.rating DESC";
+                    break;
+            }
+
             try (PreparedStatement statement = connection.prepareStatement(query)) {
                 statement.setString(1, genreId);
                 try (ResultSet resultSet = statement.executeQuery()) {
@@ -71,4 +105,5 @@ public class singlegenreservlet extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
+
 }
