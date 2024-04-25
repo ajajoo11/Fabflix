@@ -33,30 +33,20 @@ public class searchservlet extends HttpServlet {
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
 
-        // Get search parameters from the request
         String searchTerm = request.getParameter("query");
-        String[] searchCriteria = request.getParameterValues("criteria");
-
-        System.out.println("Search Term: " + searchTerm);
-        System.out.print("Search Criteria: ");
-        if (searchCriteria != null) {
-            for (String criterion : searchCriteria) {
-                System.out.print(criterion + " ");
-            }
-        } else {
-            System.out.print("No criteria specified");
-        }
+        String[] searchCriteria = request.getParameterValues("criteria[]");
 
         try (Connection conn = dataSource.getConnection()) {
             // Construct SQL query based on search criteria
             StringBuilder queryBuilder = new StringBuilder();
-            queryBuilder.append("SELECT * FROM movies WHERE ");
+            queryBuilder.append("SELECT m.*, r.rating FROM movies m LEFT JOIN ratings r ON m.id = r.movieId WHERE ");
             for (int i = 0; i < searchCriteria.length; i++) {
                 queryBuilder.append(searchCriteria[i]).append(" LIKE ? ");
                 if (i < searchCriteria.length - 1) {
                     queryBuilder.append("AND ");
                 }
             }
+            queryBuilder.append("ORDER BY r.rating DESC");
 
             // Prepare statement
             PreparedStatement statement = conn.prepareStatement(queryBuilder.toString());
@@ -80,6 +70,7 @@ public class searchservlet extends HttpServlet {
                 resultObject.addProperty("title", rs.getString("title"));
                 resultObject.addProperty("year", rs.getInt("year"));
                 resultObject.addProperty("director", rs.getString("director"));
+                resultObject.addProperty("rating", rs.getFloat("rating")); // Add rating to the JSON object
                 searchResultsArray.add(resultObject);
             }
             rs.close();

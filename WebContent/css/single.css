@@ -1,0 +1,40 @@
+body {
+    font-family: Arial, sans-serif;
+    background-image: url("https://repository-images.githubusercontent.com/299409710/b42f7780-0fe1-11eb-8460-e459acd20fb4"); /* Replace 'your-image-url.jpg' with the URL or path to your background image */
+    background-size: auto;
+    background-position: center;
+    margin: 0;
+    padding: 0;
+    /*background-color: rgba(0, 0, 0, 0.5); !* Semi-transparent black background *!*/
+    /*color: rgba(0, 0, 0, 0.5);*/
+}
+
+.container {
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 30px;
+}
+
+h1 {
+    color: #fff; /* Change heading text color to white */
+}
+h2 {
+    color: #fff; /* Change heading text color to white */
+}
+
+p {
+    color: #fff; /* Change paragraph text color to white */
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+a {
+    color: #fff; /* Links will have white color */
+    text-decoration: none;
+}
+
+a:hover {
+    color: #ccc; /* Change link color on hover */
+}
