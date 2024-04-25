@@ -15,10 +15,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.io.*;
 import java.util.Objects;
-import java.io.*;
-import java.util.Objects;
 
-@WebServlet(name = "LoginServlet", urlPatterns = "/Fabflix")
 @WebServlet(name = "LoginServlet", urlPatterns = "/Fabflix")
 public class LoginServlet extends HttpServlet {
 
@@ -35,7 +32,7 @@ public class LoginServlet extends HttpServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
         PrintWriter out = response.getWriter();
-        PrintWriter out = response.getWriter();
+    
 
         String email = request.getParameter("email");
         String password = request.getParameter("password");
