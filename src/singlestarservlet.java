@@ -175,7 +175,11 @@ public class singlestarservlet extends HttpServlet {
                 int birthYear = rs.getInt("birthYear");
                 starJson.addProperty("birthYear", Integer.toString(birthYear));
 
-                query = "SELECT m.id, m.title FROM movies m JOIN stars_in_movies sm ON m.id = sm.movieId WHERE sm.starId = ?";
+                query = "SELECT m.id, m.title, m.year " +
+                        "FROM movies m " +
+                        "JOIN stars_in_movies sm ON m.id = sm.movieId " +
+                        "WHERE sm.starId = ? " +
+                        "ORDER BY m.year DESC, m.title ASC";
                 statement = conn.prepareStatement(query);
                 statement.setString(1, starId);
                 rs = statement.executeQuery();
@@ -185,6 +189,7 @@ public class singlestarservlet extends HttpServlet {
                     JsonObject movieJson = new JsonObject();
                     movieJson.addProperty("id", rs.getString("id"));
                     movieJson.addProperty("title", rs.getString("title"));
+                    movieJson.addProperty("year", rs.getInt("year"));
                     moviesArray.add(movieJson);
                 }
                 starJson.add("movies", moviesArray);
