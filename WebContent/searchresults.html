@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Results</title>
+    <!-- Include any necessary stylesheets or scripts -->
+</head>
+
+<body>
+    <h1>Search Results</h1>
+    <div id="searchResults"></div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+
+    <script>
+        $(document).ready(function () {
+            function fetchSearchResults() {
+                let urlParams = new URLSearchParams(window.location.search);
+                let searchTerm = urlParams.get('query');
+                let searchCriteria = urlParams.get('criteria').split(',');
+
+                $.ajax({
+                    url: "searchresults",
+                    method: "GET",
+                    data: { query: searchTerm, criteria: searchCriteria },
+                    dataType: "json",
+                    success: function (data) {
+                        displaySearchResults(data);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error fetching search results:", status, error);
+                        $("#searchResults").html("<p>Error fetching search results. Please try again later.</p>");
+                    }
+                });
+            }
+
+            function displaySearchResults(results) {
+                $("#searchResults").empty();
+                if (results.length > 0) {
+                    let resultList = $("<ul></ul>");
+                    $.each(results, function (index, result) {
+                        let listItem = $("<li></li>").text(result.title);
+                        resultList.append(listItem);
+                    });
+                    $("#searchResults").append(resultList);
+                } else {
+                    $("#searchResults").html("<p>No results found.</p>");
+                }
+            }
+            fetchSearchResults();
+        });
+    </script>
+</body>
+
+</html>
