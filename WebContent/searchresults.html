@@ -6,16 +6,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Search Results</title>
     <!-- Include any necessary stylesheets or scripts -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 </head>
 
 <body>
-    <h1>Search Results</h1>
-    <div id="searchResults"></div>
+    <h1 class="text-center mb-5">Search Results</h1>
+    <div class="container">
+        <div class="row" id="searchResults">
+            <!-- Search results will be dynamically added here -->
+        </div>
+    </div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-
 
     <script>
         $(document).ready(function () {
@@ -42,12 +47,19 @@
             function displaySearchResults(results) {
                 $("#searchResults").empty();
                 if (results.length > 0) {
-                    let resultList = $("<ul></ul>");
                     $.each(results, function (index, result) {
-                        let listItem = $("<li></li>").text(result.title);
-                        resultList.append(listItem);
+                        var col = $('<div class="col-md-4 mb-4">');
+                        var card = $('<div class="card">');
+                        var cardBody = $('<div class="card-body">');
+                        var titleLink = $('<a>').attr('href', 'singlemoviepage.html?id=' + encodeURIComponent(result.id)).text(result.title);
+                        var director = $("<p class='card-text'>Director: " + result.director + "</p>");
+                        var year = $("<p class='card-text'>Year: " + result.year + "</p>");
+                        var rating = $("<p class='card-text'>Rating: " + result.rating + "</p>");
+                        cardBody.append(titleLink, director, year, rating);
+                        card.append(cardBody);
+                        col.append(card);
+                        $('#searchResults').append(col);
                     });
-                    $("#searchResults").append(resultList);
                 } else {
                     $("#searchResults").html("<p>No results found.</p>");
                 }

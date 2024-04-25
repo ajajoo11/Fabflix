@@ -112,7 +112,7 @@
             }
 
             function redirectToSearchResults(searchTerm, searchCriteria) {
-                let url = "searchresults.html?query=" + encodeURIComponent(searchTerm) + "&criteria=" + encodeURIComponent(searchCriteria.join("&"));
+                let url = "searchresults.html?query=" + encodeURIComponent(searchTerm) + "&criteria=" + encodeURIComponent(searchCriteria.join(","));
                 window.location.href = url;
             }
 

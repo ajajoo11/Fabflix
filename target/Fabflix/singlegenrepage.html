@@ -48,10 +48,12 @@
                         var card = $('<div class="card">');
                         var cardBody = $('<div class="card-body">');
                         var titleLink = $('<a>').attr('href', 'singlemoviepage.html?id=' + encodeURIComponent(movie.id)).text(movie.title);
-                        var year = $('<p class="card-text">').text('Year: ' + movie.year);
-                        var director = $('<p class="card-text">').text('Director: ' + movie.director);
+                        var director = $("<p class='card-text'>Director: " + movie.director + "</p>");
+                        var year = $("<p class='card-text'>Year: " + movie.year + "</p>");
+                        var rating = $("<p class='card-text'>Rating: " + movie.rating + "</p>");
 
-                        cardBody.append(titleLink, year, director);
+
+                        cardBody.append(titleLink, director, year, rating);
                         card.append(cardBody);
                         col.append(card);
                         genreMovies.append(col);
