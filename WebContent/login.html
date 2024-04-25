@@ -18,12 +18,13 @@
             })
                 .then(response => {
                     console.log(response); // Log the response object to the console
-                    if (response.ok) {
+                    if (response.status === 200) {
                         alert('Credentials verified!');
                         // window.location.href = response.url;
                         window.location.href = '/Fabflix/searchandbrowsepage.html'
                     } else {
                         return response.text();
+                        window.location.href = '/Fabflix/login.html'
                     }
                 })
                 .then(text => {
@@ -48,9 +49,9 @@
 
 </head>
 
-<body>
+<body>s
     <h2>Welcome to Fabflix</h2>
-    <form id="loginForm" action="/login" method="post" onsubmit="handleLogin(event)" novalidate>
+    <form id="loginForm" action="/Fablix" method="post" onsubmit="handleLogin(event)" novalidate>
         <div>
             <label for="email">Email:</label>
             <input type="email" id="email" name="email" required>
@@ -67,3 +68,30 @@
 </body>
 
 </html>
+
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <title>Login to Fabflix</title>-->
+<!--</head>-->
+
+<!--<body>-->
+<!--<h2>Welcome to Fabflix</h2>-->
+<!--<form id="loginForm" action="/Fablix" method="post" novalidate>-->
+<!--    <div>-->
+<!--        <label for="email">Email:</label>-->
+<!--        <input type="email" id="email" name="email" required>-->
+<!--    </div>-->
+<!--    <div>-->
+<!--        <label for="password">Password:</label>-->
+<!--        <input type="password" id="password" name="password" required>-->
+<!--    </div>-->
+<!--    <div>-->
+<!--        <button type="submit">Login</button>-->
+<!--    </div>-->
+<!--</form>-->
+<!--</body>-->
+
+<!--</html>-->
