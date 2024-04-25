@@ -33,7 +33,7 @@ public class moviesbyalphanumservlet extends HttpServlet {
         PrintWriter out = response.getWriter();
 
         String character = request.getParameter("charac");
-        String query;
+        String sortOption = request.getParameter("sort_option");
 
         if (character == null || character.isEmpty() || character.length() > 1) {
             JsonObject jsonObject = new JsonObject();
@@ -44,19 +44,58 @@ public class moviesbyalphanumservlet extends HttpServlet {
         }
 
         try (Connection conn = dataSource.getConnection()) {
+            String query;
+            String orderBy;
+
+            // Determine the sorting order based on the selected sort option
+            if (sortOption != null) {
+                switch (sortOption) {
+                    case "title_asc_rating_desc":
+                        orderBy = "ORDER BY m.title ASC, r.rating DESC";
+                        break;
+                    case "title_asc_rating_asc":
+                        orderBy = "ORDER BY m.title ASC, r.rating ASC";
+                        break;
+                    case "title_desc_rating_desc":
+                        orderBy = "ORDER BY m.title DESC, r.rating DESC";
+                        break;
+                    case "title_desc_rating_asc":
+                        orderBy = "ORDER BY m.title DESC, r.rating ASC";
+                        break;
+                    case "rating_asc_title_desc":
+                        orderBy = "ORDER BY r.rating ASC, m.title DESC";
+                        break;
+                    case "rating_asc_title_asc":
+                        orderBy = "ORDER BY r.rating ASC, m.title ASC";
+                        break;
+                    case "rating_desc_title_desc":
+                        orderBy = "ORDER BY r.rating DESC, m.title DESC";
+                        break;
+                    case "rating_desc_title_asc":
+                        orderBy = "ORDER BY r.rating DESC, m.title ASC";
+                        break;
+                    default:
+                        orderBy = "ORDER BY m.title ASC, r.rating DESC"; // Default sorting
+                        break;
+                }
+            } else {
+                // Default sorting
+                orderBy = "ORDER BY m.title ASC, r.rating DESC";
+            }
+
             if (character.equals("*")) {
                 query = "SELECT m.id, m.title, m.year, m.director, r.rating " +
                         "FROM movies m " +
                         "LEFT JOIN ratings r ON m.id = r.movieId " +
                         "WHERE LOWER(m.title) REGEXP '^[^a-z0-9]' " +
-                        "ORDER BY r.rating DESC";
+                        orderBy;
             } else {
                 character = character.toLowerCase() + "%";
                 query = "SELECT m.id, m.title, m.year, m.director, r.rating " +
                         "FROM movies m " +
                         "LEFT JOIN ratings r ON m.id = r.movieId " +
                         "WHERE LOWER(m.title) LIKE ? " +
-                        "ORDER BY r.rating DESC ";
+                        orderBy;
             }
 
             PreparedStatement pstmt = conn.prepareStatement(query);
