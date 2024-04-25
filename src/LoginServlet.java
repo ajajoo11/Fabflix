@@ -1,5 +1,6 @@
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
+import java.io.PrintWriter;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,8 +13,10 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.io.*;
+import java.util.Objects;
 
-@WebServlet(name = "LoginServlet", urlPatterns = "/Fablix")
+@WebServlet(name = "LoginServlet", urlPatterns = "/Fabflix")
 public class LoginServlet extends HttpServlet {
 
     private DataSource dataSource;
@@ -28,12 +31,12 @@ public class LoginServlet extends HttpServlet {
 
     public void doPost(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
+        PrintWriter out = response.getWriter();
 
         String email = request.getParameter("email");
         String password = request.getParameter("password");
-        // Inside the doPost method
+        System.out.println("Authenticating user: " + email); // Debug print
 
-        System.out.println(email + " " + password);
         boolean isValidUser = false;
 
         try (Connection dbCon = dataSource.getConnection();
@@ -45,37 +48,41 @@ public class LoginServlet extends HttpServlet {
             ResultSet rs = statement.executeQuery();
 
             if (rs.next()) {
-                Customer customer = new Customer(
-                        rs.getInt("id"),
-                        rs.getString("firstName"),
-                        rs.getString("lastName"),
-                        rs.getString("ccId"),
-                        rs.getString("address"),
-                        rs.getString("email"),
-                        rs.getString("password"));
+                out.println("User authenticated."); // Debug print
                 isValidUser = true;
                 HttpSession session = request.getSession();
-                session.setAttribute("customer", customer); // or store user object
+                response.sendRedirect("/Fabflix/searchandbrowsepage.html");
+                // session.setAttribute("customer", new Customer(
+                // rs.getInt("id"),
+                // rs.getString("firstName"),
+                // rs.getString("lastName"),
+                // rs.getString("ccId"),
+                // rs.getString("address"),
+                // rs.getString("email"),
+                // rs.getString("password")));
+            } else {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // Set response status to 401 Unauthorized
+                out.println("Authentication failed."); // Debug print
+                response.sendRedirect("/Fabflix/login.html");
+                // out.println("<html><body><h2>Error: Invalid email or
+                // password</h2></body></html>");
+                // response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             }
             rs.close();
-            response.setStatus(200);
 
         } catch (Exception e) {
             e.printStackTrace();
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Server error: " + e.getMessage());
             return;
         }
-
-        if (isValidUser) {
-            // Inside the doPost method, after successful authentication
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
-            response.getWriter().write("{\"message\": \"Credentials verified\"}");
-
-            response.sendRedirect("searchandbrowsepage.html"); // Redirect to the main page
-        } else {
-            request.setAttribute("loginError", "Invalid email or password.");
-            request.getRequestDispatcher("login.html").forward(request, response);
-        }
+        //
+        // if (isValidUser) {
+        // response.sendRedirect("searchandbrowsepage.html");
+        // } else {
+        // response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        // request.setAttribute("loginError", "Invalid email or password.");
+        // request.getRequestDispatcher("login.html").forward(request, response);
+        // }
     }
+
 }
