@@ -1,7 +1,9 @@
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import jakarta.servlet.ServletConfig;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,91 +15,85 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
-@WebServlet(name = "searchservlet", urlPatterns = "/search")
+@WebServlet(name = "searchservlet", urlPatterns = "/searchresults")
 public class searchservlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
     private DataSource dataSource;
 
     public void init(ServletConfig config) {
         try {
             dataSource = (DataSource) new InitialContext().lookup("java:comp/env/jdbc/moviedb");
         } catch (NamingException e) {
-            e.printStackTrace(); // Log the error for diagnostic purposes
-            // You might want to set a flag here to indicate that the data source is not
-            // available
+            e.printStackTrace();
         }
     }
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
 
+        // Get search parameters from the request
         String searchTerm = request.getParameter("query");
         String[] searchCriteria = request.getParameterValues("criteria");
 
-        // Construct SQL query
-        String query = "SELECT * FROM movies WHERE ";
-        List<String> conditions = new ArrayList<>();
-
-        for (String criteria : searchCriteria) {
-            switch (criteria) {
-                case "title":
-                    conditions.add("title LIKE ?");
-                    break;
-                case "year":
-                    conditions.add("year = ?");
-                    break;
-                case "director":
-                    conditions.add("director LIKE ?");
-                    break;
-                case "star":
-                    conditions.add("star LIKE ?");
-                    break;
+        System.out.println("Search Term: " + searchTerm);
+        System.out.print("Search Criteria: ");
+        if (searchCriteria != null) {
+            for (String criterion : searchCriteria) {
+                System.out.print(criterion + " ");
             }
-        }
-
-        if (!conditions.isEmpty()) {
-            query += String.join(" OR ", conditions);
         } else {
-            // No criteria selected, return empty result set
-            out.print("[]");
-            response.setStatus(HttpServletResponse.SC_OK);
-            out.close();
-            return;
+            System.out.print("No criteria specified");
         }
 
-        try (Connection conn = dataSource.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(query)) {
+        try (Connection conn = dataSource.getConnection()) {
+            // Construct SQL query based on search criteria
+            StringBuilder queryBuilder = new StringBuilder();
+            queryBuilder.append("SELECT * FROM movies WHERE ");
+            for (int i = 0; i < searchCriteria.length; i++) {
+                queryBuilder.append(searchCriteria[i]).append(" LIKE ? ");
+                if (i < searchCriteria.length - 1) {
+                    queryBuilder.append("AND ");
+                }
+            }
+
+            // Prepare statement
+            PreparedStatement statement = conn.prepareStatement(queryBuilder.toString());
+            System.out.println("SQL Query: " + queryBuilder.toString());
 
             // Set parameters
-            for (int i = 0; i < searchCriteria.length; i++) {
-                pstmt.setString(i + 1, "%" + searchTerm + "%");
+            for (int i = 1; i <= searchCriteria.length; i++) {
+                statement.setString(i, "%" + searchTerm + "%");
             }
 
             // Execute query
-            ResultSet rs = pstmt.executeQuery();
+            ResultSet rs = statement.executeQuery();
 
-            // Prepare JSON response
-            List<String> resultJSON = new ArrayList<>();
+            // Prepare JSON object to store search results
+            JsonArray searchResultsArray = new JsonArray();
+
+            // Process results
             while (rs.next()) {
-                String movieJSON = "{" +
-                        "\"title\": \"" + rs.getString("title") + "\"," +
-                        "\"year\": \"" + rs.getString("year") + "\"," +
-                        "\"director\": \"" + rs.getString("director") + "\"," +
-                        "\"star\": \"" + rs.getString("star") + "\"" +
-                        "}";
-                resultJSON.add(movieJSON);
+                JsonObject resultObject = new JsonObject();
+                resultObject.addProperty("id", rs.getString("id"));
+                resultObject.addProperty("title", rs.getString("title"));
+                resultObject.addProperty("year", rs.getInt("year"));
+                resultObject.addProperty("director", rs.getString("director"));
+                searchResultsArray.add(resultObject);
             }
+            rs.close();
+            statement.close();
 
-            out.print("[" + String.join(",", resultJSON) + "]");
-            response.setStatus(HttpServletResponse.SC_OK);
+            out.write(searchResultsArray.toString());
+            response.setStatus(200);
+
         } catch (SQLException e) {
-            e.printStackTrace(); // Log the error for diagnostic purposes
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            out.print("{\"error\": \"Internal server error\"}");
+            e.printStackTrace();
+            JsonObject errorJson = new JsonObject();
+            errorJson.addProperty("errorMessage", e.getMessage());
+            out.write(errorJson.toString());
+            response.setStatus(500);
         } finally {
             out.close();
         }
