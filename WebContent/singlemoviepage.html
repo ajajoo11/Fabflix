@@ -45,6 +45,13 @@
                 return starLinks;
             }
 
+            function createGenreLinks(genres) {
+                var genreLinks = genres.map(function (genre) {
+                    return '<a href="singlegenrepage.html?id=' + genre.id + '">' + genre.name + '</a>';
+                }).join(', ');
+                return genreLinks;
+            }
+
 
             function fetchMovieDetails() {
                 var id = getParameterByName('id');
@@ -56,7 +63,7 @@
                         var movieDetailsHtml = '<h2>' + data.title + '</h2>' +
                             '<p><strong>Year:</strong> ' + data.year + '</p>' +
                             '<p><strong>Director:</strong> ' + data.director + '</p>' +
-                            '<p><strong>Genres:</strong> ' + data.genres + '</p>' +
+                            '<p><strong>Genres:</strong> ' + createGenreLinks(data.genres) + '</p>' +
                             '<p><strong>Stars:</strong> ' + createStarLinks(data.stars) + '</p>' +
                             '<p><strong>Rating:</strong> ' + data.rating + '</p>';
                         $('#movie_details').html(movieDetailsHtml);
