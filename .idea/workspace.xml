@@ -14,20 +14,9 @@
       <change beforePath="$PROJECT_DIR$/WebContent/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/WebContent/login.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/LoginServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/LoginServlet.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/Fabflix.war" beforeDir="false" afterPath="$PROJECT_DIR$/target/Fabflix.war" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/Fabflix/WEB-INF/classes/Customer.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/Fabflix/WEB-INF/classes/Customer.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/Fabflix/WEB-INF/classes/LoginServlet.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/Fabflix/WEB-INF/classes/LoginServlet.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/Fabflix/WEB-INF/classes/MoviesServlet.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/Fabflix/WEB-INF/classes/MoviesServlet.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/Fabflix/WEB-INF/classes/singlemovieservlet.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/Fabflix/WEB-INF/classes/singlemovieservlet.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/Fabflix/WEB-INF/classes/singlestarservlet.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/Fabflix/WEB-INF/classes/singlestarservlet.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/Fabflix/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/Fabflix/login.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/Customer.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Customer.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/LoginServlet.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/LoginServlet.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/MoviesServlet.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/MoviesServlet.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/searchandbrowseservlet.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/searchandbrowseservlet.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/singlegenreservlet.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/singlegenreservlet.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/singlemovieservlet.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/singlemovieservlet.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/singlestarservlet.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/singlestarservlet.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -61,22 +50,22 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "DefaultHtmlFileTemplate": "HTML File",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "Tomcat Server.Tomcat 10.1.20.executor": "Run",
-    "git-widget-placeholder": "anzie2",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/Users/ananyajajoo/Desktop/Spring 2024/CS122B/mycs122b-projects",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;Tomcat Server.Tomcat 10.1.20.executor&quot;: &quot;Run&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;anzie2&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/ananyajajoo/Desktop/Spring 2024/CS122B/mycs122b-projects&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager">
     <configuration default="true" type="DjangoTestsConfigurationType">
       <module name="mycs122b-projects" />
@@ -310,6 +299,7 @@
       <workItem from="1713335968244" duration="3000" />
       <workItem from="1713865938731" duration="16464000" />
       <workItem from="1713937081159" duration="2405000" />
+      <workItem from="1714003321385" duration="4460000" />
     </task>
     <servers />
   </component>

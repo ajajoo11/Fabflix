@@ -16,7 +16,7 @@ import java.sql.ResultSet;
 import java.io.*;
 import java.util.Objects;
 
-@WebServlet(name = "LoginServlet", urlPatterns = "/Fablix")
+@WebServlet(name = "LoginServlet", urlPatterns = "/Fabflix")
 public class LoginServlet extends HttpServlet {
 
     private DataSource dataSource;
@@ -63,6 +63,7 @@ public class LoginServlet extends HttpServlet {
             } else {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // Set response status to 401 Unauthorized
                 out.println("Authentication failed."); // Debug print
+                response.sendRedirect("/Fabflix/login.html");
                 // out.println("<html><body><h2>Error: Invalid email or password</h2></body></html>");
 //                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             }
