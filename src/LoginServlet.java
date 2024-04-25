@@ -38,6 +38,7 @@ public class LoginServlet extends HttpServlet {
         System.out.println("Authenticating user: " + email); // Debug print
 
         boolean isValidUser = false;
+        HttpSession session = request.getSession();
 
         try (Connection dbCon = dataSource.getConnection();
              PreparedStatement statement = dbCon
@@ -50,7 +51,7 @@ public class LoginServlet extends HttpServlet {
             if (rs.next()) {
                 out.println("User authenticated."); // Debug print
                 isValidUser = true;
-                HttpSession session = request.getSession();
+                // HttpSession session = request.getSession();
                 response.sendRedirect("/Fabflix/searchandbrowsepage.html");
 //                session.setAttribute("customer", new Customer(
 //                        rs.getInt("id"),
@@ -61,11 +62,23 @@ public class LoginServlet extends HttpServlet {
 //                        rs.getString("email"),
 //                        rs.getString("password")));
             } else {
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // Set response status to 401 Unauthorized
-                out.println("Authentication failed."); // Debug print
+                session.setAttribute("loginError", "Invalid email or password.");
+                // Redirect to login.html
+               // response.sendRedirect("login.html");
+//                request.setAttribute("loginError", "Invalid email or password.");
+//                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // Set response status to 401 Unauthorized
+//                out.println("Authentication failed."); // Debug print
                 response.sendRedirect("/Fabflix/login.html");
+                // Set error message in request attribute
+//                request.setAttribute("loginError", "Invalid email or password.");
+                // Forward request to login.html
+//                request.getRequestDispatcher("login.html").forward(request, response);
                 // out.println("<html><body><h2>Error: Invalid email or password</h2></body></html>");
 //                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+//                response.setContentType("application/json");
+//                response.setCharacterEncoding("UTF-8");
+//                response.getWriter().write("{\"error\": \"Invalid email or password.\"}");
+//                return;
             }
             rs.close();
 
