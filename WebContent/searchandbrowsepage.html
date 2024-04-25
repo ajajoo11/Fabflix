@@ -69,7 +69,6 @@
 
     <script>
         $(document).ready(function () {
-            // Function to display genres
             function displayGenres(genres) {
                 let genreListElement = $("#genreList");
                 genreListElement.empty();
@@ -82,7 +81,6 @@
                 });
             }
 
-            // Function to display alphabet links
             function displayAlphabetLinks() {
                 let alphabetLinksElement = $("#alphabetRow");
                 alphabetLinksElement.empty();
@@ -94,7 +92,6 @@
                 }
             }
 
-            // Function to display number links
             function displayNumberLinks() {
                 let numberLinksElement = $("#numberRow");
                 numberLinksElement.empty();
@@ -105,7 +102,6 @@
                 }
             }
 
-            // Function to display special character link
             function displaySpecialCharLink() {
                 let specialCharLinksElement = $("#specialCharRow");
                 specialCharLinksElement.empty();
@@ -115,40 +111,23 @@
                 specialCharLinksElement.append(specialCharLink);
             }
 
-            // Function to perform the search
-            function performSearch(searchTerm, searchCriteria) {
-                // Perform AJAX request to fetch search results
-                $.ajax({
-                    url: "search",
-                    method: "GET",
-                    data: { query: searchTerm, criteria: searchCriteria }, // Pass search query and criteria to server
-                    dataType: "json",
-                    success: function (data) {
-                        // Process search results (e.g., display them)
-                        // Implement your logic here to display search results
-                        console.log("Search results:", data);
-                    },
-                    error: function (xhr, status, error) {
-                        console.error("Error fetching search results:", status, error);
-                        alert("Failed to fetch search results. Please try again later.");
-                    }
-                });
+            function redirectToSearchResults(searchTerm, searchCriteria) {
+                let url = "searchresults.html?query=" + encodeURIComponent(searchTerm) + "&criteria=" + encodeURIComponent(searchCriteria.join(","));
+                window.location.href = url;
             }
 
-            // Handle form submission for search
             $("#searchForm").submit(function (event) {
-                event.preventDefault(); // Prevent default form submission
-                let searchTerm = $("#searchInput").val().trim(); // Get search term
+                event.preventDefault();
+                let searchTerm = $("#searchInput").val().trim();
                 let searchCriteria = [];
                 $("input[type=checkbox]:checked").each(function () {
                     searchCriteria.push($(this).val());
                 });
                 if (searchTerm !== "" && searchCriteria.length > 0) {
-                    performSearch(searchTerm, searchCriteria); // Perform the search
+                    redirectToSearchResults(searchTerm, searchCriteria);
                 }
             });
 
-            // Load genres, alphabet links, number links, and special char link
             $.ajax({
                 url: "genres",
                 method: "GET",

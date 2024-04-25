@@ -13,6 +13,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 @WebServlet(name = "searchservlet", urlPatterns = "/search")
 public class searchservlet extends HttpServlet {
@@ -28,73 +30,69 @@ public class searchservlet extends HttpServlet {
         }
     }
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        doGet(request, response);
-    }
-
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
 
-        String title = request.getParameter("title");
-        String year = request.getParameter("year");
-        String director = request.getParameter("director");
-        String star = request.getParameter("star");
+        String searchTerm = request.getParameter("query");
+        String[] searchCriteria = request.getParameterValues("criteria");
 
         // Construct SQL query
-        StringBuilder queryBuilder = new StringBuilder("SELECT * FROM movies WHERE 1=1");
-        if (title != null && !title.isEmpty()) {
-            queryBuilder.append(" AND title LIKE ?");
+        String query = "SELECT * FROM movies WHERE ";
+        List<String> conditions = new ArrayList<>();
+
+        for (String criteria : searchCriteria) {
+            switch (criteria) {
+                case "title":
+                    conditions.add("title LIKE ?");
+                    break;
+                case "year":
+                    conditions.add("year = ?");
+                    break;
+                case "director":
+                    conditions.add("director LIKE ?");
+                    break;
+                case "star":
+                    conditions.add("star LIKE ?");
+                    break;
+            }
         }
-        if (year != null && !year.isEmpty()) {
-            queryBuilder.append(" AND year = ?");
-        }
-        if (director != null && !director.isEmpty()) {
-            queryBuilder.append(" AND director LIKE ?");
-        }
-        if (star != null && !star.isEmpty()) {
-            queryBuilder.append(" AND star LIKE ?");
+
+        if (!conditions.isEmpty()) {
+            query += String.join(" OR ", conditions);
+        } else {
+            // No criteria selected, return empty result set
+            out.print("[]");
+            response.setStatus(HttpServletResponse.SC_OK);
+            out.close();
+            return;
         }
 
         try (Connection conn = dataSource.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(queryBuilder.toString())) {
+                PreparedStatement pstmt = conn.prepareStatement(query)) {
 
             // Set parameters
-            int paramIndex = 1;
-            if (title != null && !title.isEmpty()) {
-                pstmt.setString(paramIndex++, "%" + title + "%");
-            }
-            if (year != null && !year.isEmpty()) {
-                pstmt.setString(paramIndex++, year);
-            }
-            if (director != null && !director.isEmpty()) {
-                pstmt.setString(paramIndex++, "%" + director + "%");
-            }
-            if (star != null && !star.isEmpty()) {
-                pstmt.setString(paramIndex++, "%" + star + "%");
+            for (int i = 0; i < searchCriteria.length; i++) {
+                pstmt.setString(i + 1, "%" + searchTerm + "%");
             }
 
             // Execute query
             ResultSet rs = pstmt.executeQuery();
 
             // Prepare JSON response
-            out.print("[");
-            boolean first = true;
+            List<String> resultJSON = new ArrayList<>();
             while (rs.next()) {
-                if (!first) {
-                    out.print(",");
-                }
-                out.print("{");
-                out.print("\"title\": \"" + rs.getString("title") + "\",");
-                out.print("\"year\": \"" + rs.getString("year") + "\",");
-                out.print("\"director\": \"" + rs.getString("director") + "\",");
-                out.print("\"star\": \"" + rs.getString("star") + "\"");
-                out.print("}");
-                first = false;
+                String movieJSON = "{" +
+                        "\"title\": \"" + rs.getString("title") + "\"," +
+                        "\"year\": \"" + rs.getString("year") + "\"," +
+                        "\"director\": \"" + rs.getString("director") + "\"," +
+                        "\"star\": \"" + rs.getString("star") + "\"" +
+                        "}";
+                resultJSON.add(movieJSON);
             }
-            out.print("]");
+
+            out.print("[" + String.join(",", resultJSON) + "]");
             response.setStatus(HttpServletResponse.SC_OK);
         } catch (SQLException e) {
             e.printStackTrace(); // Log the error for diagnostic purposes
