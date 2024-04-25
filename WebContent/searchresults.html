@@ -27,13 +27,15 @@
         $(document).ready(function () {
             function fetchSearchResults() {
                 let urlParams = new URLSearchParams(window.location.search);
-                let searchTerm = urlParams.get('query');
-                let searchCriteria = urlParams.get('criteria').split(',');
+                let title = urlParams.get('title');
+                let director = urlParams.get('director');
+                let year = urlParams.get('year');
+                let star = urlParams.get('star');
 
                 $.ajax({
                     url: "searchresults",
                     method: "GET",
-                    data: { query: searchTerm, criteria: searchCriteria },
+                    data: { title: title, director: director, year: year, star: star },
                     dataType: "json",
                     success: function (data) {
                         displaySearchResults(data);

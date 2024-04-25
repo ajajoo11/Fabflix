@@ -33,44 +33,57 @@ public class searchservlet extends HttpServlet {
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
 
-        String searchTerm = request.getParameter("query");
-        String[] searchCriteria = request.getParameterValues("criteria[]");
+        String title = request.getParameter("title");
+        String director = request.getParameter("director");
+        String year = request.getParameter("year");
+        String star = request.getParameter("star");
 
         try (Connection conn = dataSource.getConnection()) {
-            // Construct SQL query based on search criteria
             StringBuilder queryBuilder = new StringBuilder();
             queryBuilder.append("SELECT m.*, r.rating FROM movies m LEFT JOIN ratings r ON m.id = r.movieId WHERE ");
-            for (int i = 0; i < searchCriteria.length; i++) {
-                queryBuilder.append(searchCriteria[i]).append(" LIKE ? ");
-                if (i < searchCriteria.length - 1) {
-                    queryBuilder.append("AND ");
-                }
-            }
-            queryBuilder.append("ORDER BY r.rating DESC");
 
-            // Prepare statement
+            if (title != null && !title.isEmpty()) {
+                queryBuilder.append("m.title LIKE ? AND ");
+            }
+            if (director != null && !director.isEmpty()) {
+                queryBuilder.append("m.director LIKE ? AND ");
+            }
+            if (year != null && !year.isEmpty()) {
+                queryBuilder.append("m.year = ? AND ");
+            }
+            if (star != null && !star.isEmpty()) {
+                queryBuilder.append("m.star LIKE ? AND ");
+            }
+
+            queryBuilder.append("1=1"); // Add a dummy condition to ensure the query is valid
+            queryBuilder.append(" ORDER BY r.rating DESC"); // Optionally, you can order the results by rating
+
             PreparedStatement statement = conn.prepareStatement(queryBuilder.toString());
-            System.out.println("SQL Query: " + queryBuilder.toString());
+            int parameterIndex = 1;
 
-            // Set parameters
-            for (int i = 1; i <= searchCriteria.length; i++) {
-                statement.setString(i, "%" + searchTerm + "%");
+            if (title != null && !title.isEmpty()) {
+                statement.setString(parameterIndex++, "%" + title + "%");
+            }
+            if (director != null && !director.isEmpty()) {
+                statement.setString(parameterIndex++, "%" + director + "%");
+            }
+            if (year != null && !year.isEmpty()) {
+                statement.setInt(parameterIndex++, Integer.parseInt(year));
+            }
+            if (star != null && !star.isEmpty()) {
+                statement.setString(parameterIndex++, "%" + star + "%");
             }
 
-            // Execute query
             ResultSet rs = statement.executeQuery();
-
-            // Prepare JSON object to store search results
             JsonArray searchResultsArray = new JsonArray();
 
-            // Process results
             while (rs.next()) {
                 JsonObject resultObject = new JsonObject();
                 resultObject.addProperty("id", rs.getString("id"));
                 resultObject.addProperty("title", rs.getString("title"));
                 resultObject.addProperty("year", rs.getInt("year"));
                 resultObject.addProperty("director", rs.getString("director"));
-                resultObject.addProperty("rating", rs.getFloat("rating")); // Add rating to the JSON object
+                resultObject.addProperty("rating", rs.getFloat("rating"));
                 searchResultsArray.add(resultObject);
             }
             rs.close();

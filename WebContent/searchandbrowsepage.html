@@ -15,23 +15,18 @@
     <div class="container">
         <!-- Search form -->
         <form id="searchForm" class="form-inline justify-content-center mb-4">
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="checkbox" id="titleCheckbox" value="title">
-                <label class="form-check-label" for="titleCheckbox">Title</label>
+            <div class="form-group">
+                <input type="text" class="form-control mr-2" id="titleInput" placeholder="Title">
             </div>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="checkbox" id="yearCheckbox" value="year">
-                <label class="form-check-label" for="yearCheckbox">Year</label>
+            <div class="form-group">
+                <input type="text" class="form-control mr-2" id="directorInput" placeholder="Director">
             </div>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="checkbox" id="directorCheckbox" value="director">
-                <label class="form-check-label" for="directorCheckbox">Director</label>
+            <div class="form-group">
+                <input type="text" class="form-control mr-2" id="yearInput" placeholder="Year">
             </div>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="checkbox" id="starCheckbox" value="star">
-                <label class="form-check-label" for="starCheckbox">Star's Name</label>
+            <div class="form-group">
+                <input type="text" class="form-control mr-2" id="starInput" placeholder="Star's Name">
             </div>
-            <input id="searchInput" type="text" class="form-control mr-sm-2" placeholder="Search movies...">
             <button id="searchButton" type="submit" class="btn btn-primary">Search</button>
         </form>
 
@@ -111,21 +106,20 @@
                 specialCharLinksElement.append(specialCharLink);
             }
 
-            function redirectToSearchResults(searchTerm, searchCriteria) {
-                let url = "searchresults.html?query=" + encodeURIComponent(searchTerm) + "&criteria=" + encodeURIComponent(searchCriteria.join(","));
+            function redirectToSearchResults() {
+                let searchCriteria = {
+                    title: $("#titleInput").val().trim(),
+                    director: $("#directorInput").val().trim(),
+                    year: $("#yearInput").val().trim(),
+                    star: $("#starInput").val().trim()
+                };
+                let url = "searchresults.html?title=" + encodeURIComponent(searchCriteria.title) + "&director=" + encodeURIComponent(searchCriteria.director) + "&year=" + encodeURIComponent(searchCriteria.year) + "&star=" + encodeURIComponent(searchCriteria.star);
                 window.location.href = url;
             }
 
             $("#searchForm").submit(function (event) {
                 event.preventDefault();
-                let searchTerm = $("#searchInput").val().trim();
-                let searchCriteria = [];
-                $("input[type=checkbox]:checked").each(function () {
-                    searchCriteria.push($(this).val());
-                });
-                if (searchTerm !== "" && searchCriteria.length > 0) {
-                    redirectToSearchResults(searchTerm, searchCriteria);
-                }
+                redirectToSearchResults();
             });
 
             $.ajax({
