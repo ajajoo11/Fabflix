@@ -11,29 +11,65 @@
 
 <body>
 
-    <div class="container mt-5">
-        <div class="row">
-            <div class="col">
-                <h2 class="mb-4">Movies by Character</h2>
-                <div id="movieList" class="list-group">
-                    <!-- Movie list will be displayed here -->
-                </div>
+<div class="container mt-5">
+    <div class="row">
+        <div class="col">
+            <h2 class="mb-4">Movies by Character</h2>
+            <div class="form-group">
+                <label for="sortOption">Sort by:</label>
+                <select class="form-control" id="sortOption">
+                    <option value="title_asc_rating_desc">Title (Increasing), Rating (Decreasing)</option>
+                    <option value="title_asc_rating_asc">Title (Increasing), Rating (Increasing)</option>
+                    <option value="title_desc_rating_desc">Title (Decreasing), Rating (Decreasing)</option>
+                    <option value="title_desc_rating_asc">Title (Decreasing), Rating (Increasing)</option>
+                    <option value="rating_asc_title_desc">Rating (Increasing), Title (Decreasing)</option>
+                    <option value="rating_asc_title_asc">Rating (Increasing), Title (Increasing)</option>
+                    <option value="rating_desc_title_desc">Rating (Decreasing), Title (Decreasing)</option>
+                    <option value="rating_desc_title_asc">Rating (Decreasing), Title (Increasing)</option>
+                </select>
+            </div>
+            <div id="movieList" class="list-group">
+                <!-- Movie list will be displayed here -->
             </div>
         </div>
     </div>
+</div>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script>
-        $(document).ready(function () {
-            // Get the character from the query parameter
-            const urlParams = new URLSearchParams(window.location.search);
-            const character = urlParams.get('charac');
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // Get the character from the query parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const character = urlParams.get('charac');
 
-            // Make AJAX request to servlet
+        // Make AJAX request to servlet
+        $.ajax({
+            url: "moviesbyalphanum",
+            method: "GET",
+            data: {
+                charac: character,
+                sort_option: $('#sortOption').val() // Get the initial sorting option from the dropdown
+            },
+            dataType: "json",
+            success: function (data) {
+                displayMovies(data);
+            },
+            error: function (xhr, status, error) {
+                console.error("Error fetching movies:", status, error);
+                alert("Failed to fetch movies. Please try again later.");
+            }
+        });
+
+        // Event listener for when the sorting option changes
+        $('#sortOption').change(function () {
+            // Make AJAX request to servlet with updated sorting option
             $.ajax({
                 url: "moviesbyalphanum",
                 method: "GET",
-                data: { charac: character },
+                data: {
+                    charac: character,
+                    sort_option: $('#sortOption').val()
+                },
                 dataType: "json",
                 success: function (data) {
                     displayMovies(data);
@@ -43,37 +79,39 @@
                     alert("Failed to fetch movies. Please try again later.");
                 }
             });
-
-            // Function to display movies
-            function displayMovies(movies) {
-                const movieList = $("#movieList");
-
-                if (movies.length === 0) {
-                    movieList.append("<p class='text-muted'>No movies found for the character '" + character.toUpperCase() + "'</p>");
-                } else {
-                    const row = $("<div class='row'></div>");
-
-                    // Loop through each movie and create movie card
-                    movies.forEach(function (movie) {
-                        const col = $("<div class='col-md-4 mb-4'></div>");
-                        const card = $("<div class='card'></div>");
-                        const cardBody = $("<div class='card-body'></div>");
-                        const title = $("<h5 class='card-title'></h5>").html("<a href='singlemoviepage.html?id=" + movie.id + "'>" + movie.title + "</a>");
-                        const director = $("<p class='card-text'>Director: " + movie.director + "</p>");
-                        const year = $("<p class='card-text'>Year: " + movie.year + "</p>");
-                        const rating = $("<p class='card-text'>Rating: " + movie.rating + "</p>");
-
-                        cardBody.append(title, director, year, rating);
-                        card.append(cardBody);
-                        col.append(card);
-                        row.append(col);
-                    });
-
-                    movieList.append(row);
-                }
-            }
         });
-    </script>
+
+        // Function to display movies
+        function displayMovies(movies) {
+            const movieList = $("#movieList");
+
+            if (movies.length === 0) {
+                movieList.html("<p class='text-muted'>No movies found for the character '" + character.toUpperCase() + "'</p>");
+            } else {
+                movieList.empty(); // Clear previous movie list
+                const row = $("<div class='row'></div>");
+
+                // Loop through each movie and create movie card
+                movies.forEach(function (movie) {
+                    const col = $("<div class='col-md-4 mb-4'></div>");
+                    const card = $("<div class='card'></div>");
+                    const cardBody = $("<div class='card-body'></div>");
+                    const title = $("<h5 class='card-title'></h5>").html("<a href='singlemoviepage.html?id=" + movie.id + "'>" + movie.title + "</a>");
+                    const director = $("<p class='card-text'>Director: " + movie.director + "</p>");
+                    const year = $("<p class='card-text'>Year: " + movie.year + "</p>");
+                    const rating = $("<p class='card-text'>Rating: " + movie.rating + "</p>");
+
+                    cardBody.append(title, director, year, rating);
+                    card.append(cardBody);
+                    col.append(card);
+                    row.append(col);
+                });
+
+                movieList.append(row);
+            }
+        }
+    });
+</script>
 
 </body>
 
