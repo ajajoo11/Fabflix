@@ -169,6 +169,8 @@ buildNumber.properties
 .idea/
 WebContent/.DS_Store
 WebContent/WEB-INF/.DS_Store
+.DS_Store
+.vscode/
 
 
 # End of https://www.gitignore.io/api/java,maven,eclipse,java-web,intellij
