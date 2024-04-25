@@ -66,20 +66,6 @@
         </div>
         <div id="loginError" style="color: red;"></div>
     </form>
-    </div>
-
-    <script>
-        // Retrieve error message from session attribute and display it
-        document.addEventListener("DOMContentLoaded", function () {
-            var loginError = sessionStorage.getItem("loginError");
-            if (loginError) {
-                document.getElementById("loginError").innerText = loginError;
-                // Clear the error message from session storage
-                sessionStorage.removeItem("loginError");
-            }
-        });
-    </script>
-
 </body>
 
 </html>
