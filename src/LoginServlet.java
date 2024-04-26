@@ -41,47 +41,29 @@ public class LoginServlet extends HttpServlet {
         HttpSession session = request.getSession();
 
         try (Connection dbCon = dataSource.getConnection();
-                PreparedStatement statement = dbCon
-                        .prepareStatement("SELECT * FROM customers WHERE email = ? AND password = ?")) {
+             PreparedStatement statement = dbCon
+                     .prepareStatement("SELECT * FROM customers WHERE email = ?")) {
 
             statement.setString(1, email);
-            statement.setString(2, password);
             ResultSet rs = statement.executeQuery();
 
             if (rs.next()) {
-                out.println("User authenticated."); // Debug print
-                isValidUser = true;
-                // HttpSession session = request.getSession();
-                response.sendRedirect("/Fabflix/searchandbrowsepage.html");
-                // session.setAttribute("customer", new Customer(
-                // rs.getInt("id"),
-                // rs.getString("firstName"),
-                // rs.getString("lastName"),
-                // rs.getString("ccId"),
-                // rs.getString("address"),
-                // rs.getString("email"),
-                // rs.getString("password")));
+                // User email exists, check password
+                if (Objects.equals(rs.getString("password"), password)) {
+                    // Password is correct, redirect to home page
+                    isValidUser = true;
+                    response.sendRedirect("/Fabflix/searchandbrowsepage.html");
+                } else {
+                    // Password is incorrect, show password error message
+                    String errorMessage = "Invalid password. Please try again.";
+                    response.sendRedirect("/Fabflix/login.html?message=" + errorMessage);
+                }
             } else {
-                session.setAttribute("loginError", "Invalid email or password.");
-                // Redirect to login.html
-                // response.sendRedirect("login.html");
-                // request.setAttribute("loginError", "Invalid email or password.");
-                // response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // Set response
-                // status to 401 Unauthorized
-                // out.println("Authentication failed."); // Debug print
-                response.sendRedirect("/Fabflix/login.html");
-                // Set error message in request attribute
-                // request.setAttribute("loginError", "Invalid email or password.");
-                // Forward request to login.html
-                // request.getRequestDispatcher("login.html").forward(request, response);
-                // out.println("<html><body><h2>Error: Invalid email or
-                // password</h2></body></html>");
-                // response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                // response.setContentType("application/json");
-                // response.setCharacterEncoding("UTF-8");
-                // response.getWriter().write("{\"error\": \"Invalid email or password.\"}");
-                // return;
+                // User email doesn't exist, show email error message
+                String errorMessage = "Invalid email. Please try again.";
+                response.sendRedirect("/Fabflix/login.html?message=" + errorMessage);
             }
+
             rs.close();
 
         } catch (Exception e) {
@@ -89,14 +71,7 @@ public class LoginServlet extends HttpServlet {
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Server error: " + e.getMessage());
             return;
         }
-        //
-        // if (isValidUser) {
-        // response.sendRedirect("searchandbrowsepage.html");
-        // } else {
-        // response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        // request.setAttribute("loginError", "Invalid email or password.");
-        // request.getRequestDispatcher("login.html").forward(request, response);
-        // }
     }
+
 
 }

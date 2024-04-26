@@ -28,14 +28,29 @@
 
     <script>
         // Retrieve error message from session attribute and display it
-        document.addEventListener("DOMContentLoaded", function () {
-            var loginError = sessionStorage.getItem("loginError");
-            if (loginError) {
-                document.getElementById("loginError").innerText = loginError;
-                // Clear the error message from session storage
-                sessionStorage.removeItem("loginError");
+        // document.addEventListener("DOMContentLoaded", function () {
+        //     var loginError = sessionStorage.getItem("loginError");
+        //     if (loginError) {
+        //         document.getElementById("loginError").innerText = loginError;
+        //         // Clear the error message from session storage
+        //         sessionStorage.removeItem("loginError");
+        //     }
+        // });
+
+        // Function to display message
+        function displayMessage(message) {
+            var messageDiv = document.getElementById("loginError");
+            if (messageDiv) { // Check if messageDiv exists
+                messageDiv.innerText = message;
             }
-        });
+        }
+
+        // Check if message parameter exists in URL (indicating authentication failure)
+        var urlParams = new URLSearchParams(window.location.search);
+        var messageParam = urlParams.get("message");
+        if (messageParam) {
+            displayMessage(messageParam);
+        }
     </script>
 
 </body>
