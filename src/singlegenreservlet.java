@@ -26,6 +26,7 @@ public class singlegenreservlet extends HttpServlet {
     public void init() {
         try {
             dataSource = (DataSource) new InitialContext().lookup("java:comp/env/jdbc/moviedb");
+            System.out.println("DataSource initialized successfully");
         } catch (NamingException e) {
             e.printStackTrace();
         }
@@ -33,8 +34,24 @@ public class singlegenreservlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        int pageSize = 10; // Default page size
+        int pageNumber = 1; // Default page number
+
         String genreId = request.getParameter("id");
         String sortOption = request.getParameter("sort_option");
+        String pageSizeParam = request.getParameter("pageSize");
+        String pageNumberParam = request.getParameter("pageNumber");
+
+        // Check if pageSize parameter is provided and parse it
+        if (pageSizeParam != null) {
+            pageSize = Integer.parseInt(pageSizeParam);
+        }
+
+        // Check if pageNumber parameter is provided and parse it
+        if (pageNumberParam != null) {
+            pageNumber = Integer.parseInt(pageNumberParam);
+        }
+
 
         if (genreId == null || genreId.isEmpty() || sortOption == null || sortOption.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -79,9 +96,21 @@ public class singlegenreservlet extends HttpServlet {
                     query += "m.title ASC, r.rating DESC";
                     break;
             }
+            // Calculate offset based on page number and page size
+            int offset = (pageNumber - 1) * pageSize;
+
+            // Append limit and offset to query
+            query += " LIMIT ? OFFSET ?";
+
+
+            System.out.println(query);
+
 
             try (PreparedStatement statement = connection.prepareStatement(query)) {
                 statement.setString(1, genreId);
+                statement.setInt(2, pageSize);
+                statement.setInt(3, offset);
+
                 try (ResultSet resultSet = statement.executeQuery()) {
                     JsonArray moviesArray = new JsonArray();
                     while (resultSet.next()) {

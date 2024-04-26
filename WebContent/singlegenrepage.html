@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Movies by Genre</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+          crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="css/moviepage.css">
 </head>
 
@@ -32,6 +33,23 @@
         </div>
     </div>
 
+    <!-- Pagination controls -->
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label for="page_size">Movies per Page:</label>
+            <select class="form-control" id="page_size">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select>
+        </div>
+        <div class="col-md-6 text-right">
+            <button class="btn btn-primary" id="prev_btn">Previous</button>
+            <button class="btn btn-primary ml-2" id="next_btn">Next</button>
+        </div>
+    </div>
+
     <div class="row" id="genreMovies">
         <!-- Genre cards will be dynamically added here -->
     </div>
@@ -43,20 +61,17 @@
 
 <script>
     $(document).ready(function () {
-        // Function to parse URL query parameters
-        function getUrlParameter(name) {
-            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
-            var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
-            var results = regex.exec(location.search);
-            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
-        };
-
-        // Function to fetch movies by genre with sorting parameters
-        function fetchMoviesByGenre(sortOption) {
-            var genreId = getUrlParameter('id');
+        var pageNumber = 1; // Initialize page number
+        // Function to fetch movies by genre with sorting and pagination parameters
+        function fetchMoviesByGenre() {
+            var urlParams = new URLSearchParams(window.location.search);
+            var genreId = urlParams.get('id');
+            var sortOption = $('#sort_option').val();
+            var pageSize = $('#page_size').val();
+            // var pageNumber = $('#page_number').val() || 1;
 
             $.ajax({
-                url: 'singlegenrepage?id=' + genreId + '&sort_option=' + sortOption,
+                url: 'singlegenrepage?id=' + genreId + '&sort_option=' + sortOption + '&pageSize=' + pageSize + '&pageNumber=' + pageNumber,
                 method: 'GET',
                 dataType: 'json',
                 success: function (movies) {
@@ -86,15 +101,30 @@
             });
         }
 
-        // Event listener for sorting options change
-        $('#sort_option').change(function () {
-            var sortOption = $('#sort_option').val();
-            fetchMoviesByGenre(sortOption); // Fetch movies with selected sorting parameters
+        // Event listeners for sorting options, page size, and page number
+        $('#sort_option, #page_size').change(function () {
+            pageNumber = 1; // Reset page number to 1 when sorting or page size is changed
+            fetchMoviesByGenre(); // Fetch movies with selected parameters
+
         });
 
-        // Fetch movies by genre with default sorting parameters on page load
-        fetchMoviesByGenre('title_asc_rating_desc');
+        $('#prev_btn').click(function () {
+            if (pageNumber > 1) {
+                pageNumber--;
+                fetchMoviesByGenre(); // Fetch movies with updated page number
+            }
+        });
+
+        $('#next_btn').click(function () {
+            pageNumber++;
+            fetchMoviesByGenre(); // Fetch movies with updated page number
+        });
+
+        // Fetch movies by genre with default parameters on page load
+        fetchMoviesByGenre();
     });
+
+
 </script>
 
 </body>
