@@ -70,7 +70,7 @@
 
                 $.each(genres, function (index, genre) {
                     let listItem = $('<li class="list-group-item"></li>');
-                    let genreLink = $('<a></a>').text(genre.name).attr('href', 'singlegenrepage.html?id=' + encodeURIComponent(genre.id));
+                    let genreLink = $('<a></a>').text(genre.name).attr('href', 'moviespage.html?id=' + encodeURIComponent(genre.id));
                     listItem.append(genreLink);
                     genreListElement.append(listItem);
                 });
@@ -82,7 +82,7 @@
 
                 for (let charCode = 65; charCode <= 90; charCode++) {
                     let letter = String.fromCharCode(charCode);
-                    let alphabetLink = $('<a class="mx-2"></a>').text(letter).attr('href', 'moviesbyalphanum.html?charac=' + encodeURIComponent(letter));
+                    let alphabetLink = $('<a class="mx-2"></a>').text(letter).attr('href', 'moviespage.html?charac=' + encodeURIComponent(letter));
                     alphabetLinksElement.append(alphabetLink);
                 }
             }
@@ -92,7 +92,7 @@
                 numberLinksElement.empty();
 
                 for (let digit = 0; digit <= 9; digit++) {
-                    let numberLink = $('<a class="mx-2"></a>').text(digit).attr('href', 'moviesbyalphanum.html?charac=' + encodeURIComponent(digit));
+                    let numberLink = $('<a class="mx-2"></a>').text(digit).attr('href', 'moviespage.html?charac=' + encodeURIComponent(digit));
                     numberLinksElement.append(numberLink);
                 }
             }
@@ -102,7 +102,7 @@
                 specialCharLinksElement.empty();
 
                 let specialChar = '*';
-                let specialCharLink = $('<a class="mx-2"></a>').text(specialChar).attr('href', 'moviesbyalphanum.html?charac=' + encodeURIComponent(specialChar));
+                let specialCharLink = $('<a class="mx-2"></a>').text(specialChar).attr('href', 'moviespage.html?charac=' + encodeURIComponent(specialChar));
                 specialCharLinksElement.append(specialCharLink);
             }
 
@@ -113,7 +113,7 @@
                     year: $("#yearInput").val().trim(),
                     star: $("#starInput").val().trim()
                 };
-                let url = "searchresults.html?title=" + encodeURIComponent(searchCriteria.title) + "&director=" + encodeURIComponent(searchCriteria.director) + "&year=" + encodeURIComponent(searchCriteria.year) + "&star=" + encodeURIComponent(searchCriteria.star);
+                let url = "moviespage.html?title=" + encodeURIComponent(searchCriteria.title) + "&director=" + encodeURIComponent(searchCriteria.director) + "&year=" + encodeURIComponent(searchCriteria.year) + "&star=" + encodeURIComponent(searchCriteria.star);
                 window.location.href = url;
             }
 
