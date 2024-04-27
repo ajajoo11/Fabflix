@@ -73,10 +73,13 @@
 
             // Load script based on URL parameters
             var titleParam = getUrlParameter('title');
+            var directorParam = getUrlParameter('director');
+            var yearParam = getUrlParameter('year');
+            var starParam = getUrlParameter('star');
             var idParam = getUrlParameter('id');
             var characParam = getUrlParameter('charac');
 
-            if (titleParam !== '') {
+            if (titleParam !== '' || directorParam !== '' || yearParam !== '' || starParam !== '') {
                 // Script for title parameter
                 $(document).ready(function () {
                     function fetchSearchResults() {
