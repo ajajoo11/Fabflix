@@ -98,14 +98,9 @@ public class singlegenreservlet extends HttpServlet {
             }
             // Calculate offset based on page number and page size
             int offset = (pageNumber - 1) * pageSize;
-
             // Append limit and offset to query
             query += " LIMIT ? OFFSET ?";
-
-
             System.out.println(query);
-
-
             try (PreparedStatement statement = connection.prepareStatement(query)) {
                 statement.setString(1, genreId);
                 statement.setInt(2, pageSize);
@@ -120,7 +115,6 @@ public class singlegenreservlet extends HttpServlet {
                         movieObject.addProperty("director", resultSet.getString("director"));
                         movieObject.addProperty("id", resultSet.getString("id"));
                         movieObject.addProperty("rating", resultSet.getFloat("rating"));
-
                         moviesArray.add(movieObject);
                     }
                     PrintWriter out = response.getWriter();

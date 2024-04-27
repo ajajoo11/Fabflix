@@ -34,6 +34,21 @@ public class moviesbyalphanumservlet extends HttpServlet {
 
         String character = request.getParameter("charac");
         String sortOption = request.getParameter("sort_option");
+        int pageSize = 10; // Default page size
+        int pageNumber = 1; // Default page number
+
+        String pageSizeParam = request.getParameter("pageSize");
+        String pageNumberParam = request.getParameter("pageNumber");
+
+        // Check if pageSize parameter is provided and parse it
+        if (pageSizeParam != null) {
+            pageSize = Integer.parseInt(pageSizeParam);
+        }
+
+        // Check if pageNumber parameter is provided and parse it
+        if (pageNumberParam != null) {
+            pageNumber = Integer.parseInt(pageNumberParam);
+        }
 
         if (character == null || character.isEmpty() || character.length() > 1) {
             JsonObject jsonObject = new JsonObject();
@@ -43,67 +58,9 @@ public class moviesbyalphanumservlet extends HttpServlet {
             return;
         }
 
-        try (Connection conn = dataSource.getConnection()) {
-            String query;
-            String orderBy;
-
-            // Determine the sorting order based on the selected sort option
-            if (sortOption != null) {
-                switch (sortOption) {
-                    case "title_asc_rating_desc":
-                        orderBy = "ORDER BY m.title ASC, r.rating DESC";
-                        break;
-                    case "title_asc_rating_asc":
-                        orderBy = "ORDER BY m.title ASC, r.rating ASC";
-                        break;
-                    case "title_desc_rating_desc":
-                        orderBy = "ORDER BY m.title DESC, r.rating DESC";
-                        break;
-                    case "title_desc_rating_asc":
-                        orderBy = "ORDER BY m.title DESC, r.rating ASC";
-                        break;
-                    case "rating_asc_title_desc":
-                        orderBy = "ORDER BY r.rating ASC, m.title DESC";
-                        break;
-                    case "rating_asc_title_asc":
-                        orderBy = "ORDER BY r.rating ASC, m.title ASC";
-                        break;
-                    case "rating_desc_title_desc":
-                        orderBy = "ORDER BY r.rating DESC, m.title DESC";
-                        break;
-                    case "rating_desc_title_asc":
-                        orderBy = "ORDER BY r.rating DESC, m.title ASC";
-                        break;
-                    default:
-                        orderBy = "ORDER BY m.title ASC, r.rating DESC"; // Default sorting
-                        break;
-                }
-            } else {
-                // Default sorting
-                orderBy = "ORDER BY m.title ASC, r.rating DESC";
-            }
-
-            if (character.equals("*")) {
-                query = "SELECT m.id, m.title, m.year, m.director, r.rating " +
-                        "FROM movies m " +
-                        "LEFT JOIN ratings r ON m.id = r.movieId " +
-                        "WHERE LOWER(m.title) REGEXP '^[^a-z0-9]' " +
-                        orderBy;
-            } else {
-                character = character.toLowerCase() + "%";
-                query = "SELECT m.id, m.title, m.year, m.director, r.rating " +
-                        "FROM movies m " +
-                        "LEFT JOIN ratings r ON m.id = r.movieId " +
-                        "WHERE LOWER(m.title) LIKE ? " +
-                        orderBy;
-            }
-
-            PreparedStatement pstmt = conn.prepareStatement(query);
-            if (!character.equals("*")) {
-                pstmt.setString(1, character);
-            }
-
-            ResultSet rs = pstmt.executeQuery();
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement pstmt = buildPreparedStatement(conn, character, sortOption, pageSize, pageNumber);
+             ResultSet rs = pstmt.executeQuery()) {
 
             JsonArray jsonArray = new JsonArray();
             while (rs.next()) {
@@ -116,10 +73,6 @@ public class moviesbyalphanumservlet extends HttpServlet {
 
                 jsonArray.add(jsonObject);
             }
-            rs.close();
-            pstmt.close();
-
-            System.out.println(jsonArray.toString());
 
             request.getServletContext().log("getting " + jsonArray.size() + " results");
 
@@ -134,5 +87,79 @@ public class moviesbyalphanumservlet extends HttpServlet {
         } finally {
             out.close();
         }
+    }
+
+    private PreparedStatement buildPreparedStatement(Connection conn, String character, String sortOption, int pageSize, int pageNumber) throws Exception {
+        String query;
+        String orderBy;
+
+        // Determine the sorting order based on the selected sort option
+        if (sortOption != null) {
+            switch (sortOption) {
+                case "title_asc_rating_desc":
+                    orderBy = "ORDER BY m.title ASC, r.rating DESC";
+                    break;
+                case "title_asc_rating_asc":
+                    orderBy = "ORDER BY m.title ASC, r.rating ASC";
+                    break;
+                case "title_desc_rating_desc":
+                    orderBy = "ORDER BY m.title DESC, r.rating DESC";
+                    break;
+                case "title_desc_rating_asc":
+                    orderBy = "ORDER BY m.title DESC, r.rating ASC";
+                    break;
+                case "rating_asc_title_desc":
+                    orderBy = "ORDER BY r.rating ASC, m.title DESC";
+                    break;
+                case "rating_asc_title_asc":
+                    orderBy = "ORDER BY r.rating ASC, m.title ASC";
+                    break;
+                case "rating_desc_title_desc":
+                    orderBy = "ORDER BY r.rating DESC, m.title DESC";
+                    break;
+                case "rating_desc_title_asc":
+                    orderBy = "ORDER BY r.rating DESC, m.title ASC";
+                    break;
+                default:
+                    orderBy = "ORDER BY m.title ASC, r.rating DESC"; // Default sorting
+                    break;
+            }
+        } else {
+            // Default sorting
+            orderBy = "ORDER BY m.title ASC, r.rating DESC";
+        }
+
+        if (character.equals("*")) {
+            query = "SELECT m.id, m.title, m.year, m.director, r.rating " +
+                    "FROM movies m " +
+                    "LEFT JOIN ratings r ON m.id = r.movieId " +
+                    "WHERE LOWER(m.title) REGEXP '^[^a-z0-9]' " +
+                    orderBy;
+        } else {
+            character = character.toLowerCase() + "%";
+            query = "SELECT m.id, m.title, m.year, m.director, r.rating " +
+                    "FROM movies m " +
+                    "LEFT JOIN ratings r ON m.id = r.movieId " +
+                    "WHERE LOWER(m.title) LIKE ? " +
+                    orderBy;
+        }
+
+        // Calculate offset based on page size and page number
+        int offset = (pageNumber - 1) * pageSize;
+
+        // Modify the query to include pagination
+        query += " LIMIT ? OFFSET ?";
+
+        PreparedStatement pstmt = conn.prepareStatement(query);
+        if (!character.equals("*")) {
+            pstmt.setString(1, character);
+            pstmt.setInt(2, pageSize);
+            pstmt.setInt(3, offset);
+        } else {
+            pstmt.setInt(1, pageSize);
+            pstmt.setInt(2, offset);
+        }
+
+        return pstmt;
     }
 }

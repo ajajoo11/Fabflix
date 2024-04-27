@@ -28,6 +28,19 @@
                     <option value="rating_desc_title_asc">Rating (Decreasing), Title (Increasing)</option>
                 </select>
             </div>
+            <div class="form-group">
+                <label for="pageSize">Movies per Page:</label>
+                <select class="form-control" id="pageSize">
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+            </div>
+            <div class="col-md-6 text-right">
+                <button class="btn btn-primary" id="prev_btn">Previous</button>
+                <button class="btn btn-primary ml-2" id="next_btn">Next</button>
+            </div>
             <div id="movieList" class="list-group">
                 <!-- Movie list will be displayed here -->
             </div>
@@ -38,68 +51,51 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script>
     $(document).ready(function () {
-        // Get the character from the query parameter
-        const urlParams = new URLSearchParams(window.location.search);
-        const character = urlParams.get('charac');
+        var pageNumber = 1; // Initialize page number
+        var pageSize = 10; // Default page size
 
-        // Make AJAX request to servlet
-        $.ajax({
-            url: "moviesbyalphanum",
-            method: "GET",
-            data: {
-                charac: character,
-                sort_option: $('#sortOption').val() // Get the initial sorting option from the dropdown
-            },
-            dataType: "json",
-            success: function (data) {
-                displayMovies(data);
-            },
-            error: function (xhr, status, error) {
-                console.error("Error fetching movies:", status, error);
-                alert("Failed to fetch movies. Please try again later.");
-            }
-        });
-
-        // Event listener for when the sorting option changes
-        $('#sortOption').change(function () {
-            // Make AJAX request to servlet with updated sorting option
+        // Function to fetch movies by character with sorting and pagination parameters
+        function fetchMoviesByCharacter() {
+            var character = getUrlParameter('charac');
+            var sortOption = $('#sortOption').val();
             $.ajax({
-                url: "moviesbyalphanum",
-                method: "GET",
+                url: 'moviesbyalphanum',
+                method: 'GET',
                 data: {
                     charac: character,
-                    sort_option: $('#sortOption').val()
+                    sort_option: sortOption,
+                    pageSize: pageSize,
+                    pageNumber: pageNumber
                 },
-                dataType: "json",
-                success: function (data) {
-                    displayMovies(data);
+                dataType: 'json',
+                success: function (movies) {
+                    displayMovies(movies);
                 },
                 error: function (xhr, status, error) {
-                    console.error("Error fetching movies:", status, error);
-                    alert("Failed to fetch movies. Please try again later.");
+                    console.error('Error fetching movies by character:', status, error);
+                    alert('Failed to fetch movies by character. Please try again later.');
                 }
             });
-        });
+        }
 
         // Function to display movies
         function displayMovies(movies) {
-            const movieList = $("#movieList");
+            var movieList = $('#movieList');
+            movieList.empty(); // Clear existing movie list
 
             if (movies.length === 0) {
-                movieList.html("<p class='text-muted'>No movies found for the character '" + character.toUpperCase() + "'</p>");
+                movieList.html("<p class='text-muted'>No movies found for the character '" + getUrlParameter('charac').toUpperCase() + "'</p>");
             } else {
-                movieList.empty(); // Clear previous movie list
-                const row = $("<div class='row'></div>");
+                var row = $('<div class="row"></div>');
 
-                // Loop through each movie and create movie card
-                movies.forEach(function (movie) {
-                    const col = $("<div class='col-md-4 mb-4'></div>");
-                    const card = $("<div class='card'></div>");
-                    const cardBody = $("<div class='card-body'></div>");
-                    const title = $("<h5 class='card-title'></h5>").html("<a href='singlemoviepage.html?id=" + movie.id + "'>" + movie.title + "</a>");
-                    const director = $("<p class='card-text'>Director: " + movie.director + "</p>");
-                    const year = $("<p class='card-text'>Year: " + movie.year + "</p>");
-                    const rating = $("<p class='card-text'>Rating: " + movie.rating + "</p>");
+                $.each(movies, function (index, movie) {
+                    var col = $('<div class="col-md-4 mb-4"></div>');
+                    var card = $('<div class="card"></div>');
+                    var cardBody = $('<div class="card-body"></div>');
+                    var title = $('<h5 class="card-title"></h5>').html("<a href='singlemoviepage.html?id=" + movie.id + "'>" + movie.title + "</a>");
+                    var director = $('<p class="card-text">Director: ' + movie.director + '</p>');
+                    var year = $('<p class="card-text">Year: ' + movie.year + '</p>');
+                    var rating = $('<p class="card-text">Rating: ' + movie.rating + '</p>');
 
                     cardBody.append(title, director, year, rating);
                     card.append(cardBody);
@@ -110,6 +106,37 @@
                 movieList.append(row);
             }
         }
+
+        // Function to get URL parameter
+        function getUrlParameter(name) {
+            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+            var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+            var results = regex.exec(location.search);
+            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+        }
+
+        // Event listeners for sorting option and page size
+        $('#sortOption, #pageSize').change(function () {
+            pageNumber = 1; // Reset page number to 1 when sorting or page size is changed
+            pageSize = parseInt($('#pageSize').val());
+            fetchMoviesByCharacter(); // Fetch movies with selected parameters
+        });
+
+        // Event listeners for Previous and Next buttons
+        $('#prev_btn').click(function () {
+            if (pageNumber > 1) {
+                pageNumber--;
+                fetchMoviesByCharacter(); // Fetch movies with updated page number
+            }
+        });
+
+        $('#next_btn').click(function () {
+            pageNumber++;
+            fetchMoviesByCharacter(); // Fetch movies with updated page number
+        });
+
+        // Fetch movies by character with default parameters on page load
+        fetchMoviesByCharacter();
     });
 </script>
 
