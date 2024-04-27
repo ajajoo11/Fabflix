@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movies Page</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="css/moviepage.css">
+</head>
+
+<body>
+
+    <div class="container mt-5">
+        <h1 class="text-center mb-5">Movies Page</h1>
+
+        <!-- Sorting options -->
+        <div class="row mb-3">
+            <div class="col-md-12">
+                <label for="sort_option">Sort by:</label>
+                <select class="form-control" id="sort_option">
+                    <option value="title_asc_rating_desc">Title (Increasing) - Rating (Decreasing)</option>
+                    <option value="title_asc_rating_asc">Title (Increasing) - Rating (Increasing)</option>
+                    <option value="title_desc_rating_desc">Title (Decreasing) - Rating (Decreasing)</option>
+                    <option value="title_desc_rating_asc">Title (Decreasing) - Rating (Increasing)</option>
+                    <option value="rating_asc_title_desc">Rating (Increasing) - Title (Decreasing)</option>
+                    <option value="rating_asc_title_asc">Rating (Increasing) - Title (Increasing)</option>
+                    <option value="rating_desc_title_desc">Rating (Decreasing) - Title (Decreasing)</option>
+                    <option value="rating_desc_title_asc">Rating (Decreasing) - Title (Increasing)</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Pagination controls -->
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="page_size">Movies per Page:</label>
+                <select class="form-control" id="page_size">
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+            </div>
+            <div class="col-md-6 text-right">
+                <button class="btn btn-primary" id="prev_btn">Previous</button>
+                <button class="btn btn-primary ml-2" id="next_btn">Next</button>
+            </div>
+        </div>
+
+        <div class="row" id="genreMovies">
+            <!-- Genre cards will be dynamically added here -->
+        </div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+
+
+    <script>
+        // Check URL parameters and load specific scripts
+        $(document).ready(function () {
+            // Function to get URL parameters
+            function getUrlParameter(name) {
+                name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+                var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+                var results = regex.exec(location.search);
+                return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+            }
+
+            // Load script based on URL parameters
+            var titleParam = getUrlParameter('title');
+            var idParam = getUrlParameter('id');
+            var characParam = getUrlParameter('charac');
+
+            if (titleParam !== '') {
+                // Script for title parameter
+                $(document).ready(function () {
+                    function fetchSearchResults() {
+                        let urlParams = new URLSearchParams(window.location.search);
+                        let title = urlParams.get('title');
+                        let director = urlParams.get('director');
+                        let year = urlParams.get('year');
+                        let star = urlParams.get('star');
+
+                        $.ajax({
+                            url: "searchresults",
+                            method: "GET",
+                            data: { title: title, director: director, year: year, star: star },
+                            dataType: "json",
+                            success: function (data) {
+                                displaySearchResults(data);
+                            },
+                            error: function (xhr, status, error) {
+                                console.error("Error fetching search results:", status, error);
+                                $("#searchResults").html("<p>Error fetching search results. Please try again later.</p>");
+                            }
+                        });
+                    }
+
+                    function displaySearchResults(results) {
+                        $("#searchResults").empty();
+                        if (results.length > 0) {
+                            $.each(results, function (index, result) {
+                                var col = $('<div class="col-md-4 mb-4">');
+                                var card = $('<div class="card">');
+                                var cardBody = $('<div class="card-body">');
+                                var titleLink = $('<a>').attr('href', 'singlemoviepage.html?id=' + encodeURIComponent(result.id)).text(result.title);
+                                var director = $("<p class='card-text'>Director: " + result.director + "</p>");
+                                var year = $("<p class='card-text'>Year: " + result.year + "</p>");
+                                var rating = $("<p class='card-text'>Rating: " + result.rating + "</p>");
+                                cardBody.append(titleLink, director, year, rating);
+                                card.append(cardBody);
+                                col.append(card);
+                                $('#searchResults').append(col);
+                            });
+                        } else {
+                            $("#searchResults").html("<p>No results found.</p>");
+                        }
+                    }
+                    fetchSearchResults();
+                });
+            } else if (idParam !== '') {
+                $(document).ready(function () {
+                    var pageNumber = 1; // Initialize page number
+                    // Function to fetch movies by genre with sorting and pagination parameters
+                    function fetchMoviesByGenre() {
+                        var urlParams = new URLSearchParams(window.location.search);
+                        var genreId = urlParams.get('id');
+                        var sortOption = $('#sort_option').val();
+                        var pageSize = $('#page_size').val();
+                        // var pageNumber = $('#page_number').val() || 1;
+
+                        $.ajax({
+                            url: 'singlegenrepage?id=' + genreId + '&sort_option=' + sortOption + '&pageSize=' + pageSize + '&pageNumber=' + pageNumber,
+                            method: 'GET',
+                            dataType: 'json',
+                            success: function (movies) {
+                                var genreMovies = $('#genreMovies');
+                                genreMovies.empty(); // Clear existing movie cards
+
+                                $.each(movies, function (index, movie) {
+                                    // Create movie card and append to genreMovies
+                                    var col = $('<div class="col-md-4 mb-4">');
+                                    var card = $('<div class="card">');
+                                    var cardBody = $('<div class="card-body">');
+                                    var titleLink = $('<a>').attr('href', 'singlemoviepage.html?id=' + encodeURIComponent(movie.id)).text(movie.title);
+                                    var director = $("<p class='card-text'>Director: " + movie.director + "</p>");
+                                    var year = $("<p class='card-text'>Year: " + movie.year + "</p>");
+                                    var rating = $("<p class='card-text'>Rating: " + movie.rating + "</p>");
+
+                                    cardBody.append(titleLink, director, year, rating);
+                                    card.append(cardBody);
+                                    col.append(card);
+                                    genreMovies.append(col);
+                                });
+                            },
+                            error: function (xhr, status, error) {
+                                console.error('Error fetching movies by genre:', status, error);
+                                alert('Failed to fetch movies by genre. Please try again later.');
+                            }
+                        });
+                    }
+
+                    // Event listeners for sorting options, page size, and page number
+                    $('#sort_option, #page_size').change(function () {
+                        pageNumber = 1; // Reset page number to 1 when sorting or page size is changed
+                        fetchMoviesByGenre(); // Fetch movies with selected parameters
+
+                    });
+
+                    $('#prev_btn').click(function () {
+                        if (pageNumber > 1) {
+                            pageNumber--;
+                            fetchMoviesByGenre(); // Fetch movies with updated page number
+                        }
+                    });
+
+                    $('#next_btn').click(function () {
+                        pageNumber++;
+                        fetchMoviesByGenre(); // Fetch movies with updated page number
+                    });
+
+                    // Fetch movies by genre with default parameters on page load
+                    fetchMoviesByGenre();
+                });
+
+
+            } else if (characParam !== '') {
+                // Script for charac parameter
+                $(document).ready(function () {
+                    var pageNumber = 1; // Initialize page number
+                    var pageSize = 10; // Default page size
+
+                    // Function to fetch movies by character with sorting and pagination parameters
+                    function fetchMoviesByCharacter() {
+                        var character = getUrlParameter('charac');
+                        var sortOption = $('#sort_option').val();
+                        $.ajax({
+                            url: 'moviesbyalphanum',
+                            method: 'GET',
+                            data: {
+                                charac: character,
+                                sort_option: sortOption,
+                                pageSize: pageSize,
+                                pageNumber: pageNumber
+                            },
+                            dataType: 'json',
+                            success: function (movies) {
+                                displayMovies(movies);
+                            },
+                            error: function (xhr, status, error) {
+                                console.error('Error fetching movies by character:', status, error);
+                                alert('Failed to fetch movies by character. Please try again later.');
+                            }
+                        });
+                    }
+
+                    // Function to display movies
+                    function displayMovies(movies) {
+                        var movieList = $('#genreMovies');
+                        movieList.empty(); // Clear existing movie list
+
+                        if (movies.length === 0) {
+                            movieList.html("<p class='text-muted'>No movies found for the character '" + getUrlParameter('charac').toUpperCase() + "'</p>");
+                        } else {
+                            var row = $('<div class="row"></div>');
+
+                            $.each(movies, function (index, movie) {
+                                var col = $('<div class="col-md-4 mb-4"></div>');
+                                var card = $('<div class="card"></div>');
+                                var cardBody = $('<div class="card-body"></div>');
+                                var title = $('<h5 class="card-title"></h5>').html("<a href='singlemoviepage.html?id=" + movie.id + "'>" + movie.title + "</a>");
+                                var director = $('<p class="card-text">Director: ' + movie.director + '</p>');
+                                var year = $('<p class="card-text">Year: ' + movie.year + '</p>');
+                                var rating = $('<p class="card-text">Rating: ' + movie.rating + '</p>');
+
+                                cardBody.append(title, director, year, rating);
+                                card.append(cardBody);
+                                col.append(card);
+                                row.append(col);
+                            });
+
+                            movieList.append(row);
+                        }
+                    }
+
+                    // Function to get URL parameter
+                    function getUrlParameter(name) {
+                        name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+                        var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+                        var results = regex.exec(location.search);
+                        return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+                    }
+
+                    // Event listeners for sorting option and page size
+                    $('#sort_option, #page_size').change(function () {
+                        pageNumber = 1; // Reset page number to 1 when sorting or page size is changed
+                        pageSize = parseInt($('#page_size').val());
+                        fetchMoviesByCharacter(); // Fetch movies with selected parameters
+                    });
+
+                    // Event listeners for Previous and Next buttons
+                    $('#prev_btn').click(function () {
+                        if (pageNumber > 1) {
+                            pageNumber--;
+                            fetchMoviesByCharacter(); // Fetch movies with updated page number
+                        }
+                    });
+
+                    $('#next_btn').click(function () {
+                        pageNumber++;
+                        fetchMoviesByCharacter(); // Fetch movies with updated page number
+                    });
+
+                    // Fetch movies by character with default parameters on page load
+                    fetchMoviesByCharacter();
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>
