@@ -47,10 +47,14 @@
                 <button class="btn btn-primary" id="prev_btn">Previous</button>
                 <button class="btn btn-primary ml-2" id="next_btn">Next</button>
             </div>
+            <div class="container mt-3">
+                <a href="cart" class="btn btn-primary">View Cart</a>
+            </div>
         </div>
 
         <div class="row" id="genreMovies">
             <!-- Genre cards will be dynamically added here -->
+            <button class="btn btn-primary add-to-cart-btn" data-movie-id="movie_id_here">Add to Cart</button>
         </div>
     </div>
 
@@ -61,6 +65,38 @@
 
 
     <script>
+        $(document).ready(function () {
+            // Event listener for Add to Cart button clicks
+            $(document).on('click', '.add-to-cart-btn', function () {
+                var movieId = $(this).data('movie-id');
+                var movieTitle = $(this).data('movie-title'); // Retrieve movie title from data attribute
+                addToCart(movieId, movieTitle);
+            });
+
+            // Function to add movie to the cart
+            function addToCart(movieId, movieTitle) {
+                console.log('Adding movie to cart:', movieId, movieTitle); // Debug statement
+                $.ajax({
+                    url: 'addToCart',
+                    method: 'POST',
+                    data: {
+                        movieId: movieId,
+                        movieTitle: movieTitle // Pass movieTitle as a parameter in the AJAX request
+                    },
+                    dataType: 'json',
+                    success: function (response) {
+                        console.log('Add to cart success:', response); // Debug statement
+                        alert('Movie added to cart successfully!');
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Add to cart error:', status, error); // Debug statement
+                        alert('Failed to add movie to cart. Please try again later.');
+                    }
+                });
+            }
+
+        });
+
         // Check URL parameters and load specific scripts
         $(document).ready(function () {
             // Function to get URL parameters
@@ -152,6 +188,13 @@
                                 }
                                 var starPara = $("<p class='card-text'>").html(starsText);
                                 cardContent.append(starPara, rating);
+
+                                // Add "Add to Cart" button here
+                                // Add "Add to Cart" button here
+                                var addToCartBtn = $("<button class='btn btn-primary add-to-cart-btn' data-movie-id='" + result.id + "' data-movie-title='" + result.title + "'>Add to Cart</button>");
+                                cardContent.append(addToCartBtn);
+
+
                                 cardBody.append(cardContent);
                                 card.append(cardBody);
                                 searchResultsContainer.append(card);
@@ -242,6 +285,11 @@
                                     }
                                     var starPara = $("<p class='card-text'>").html(starsText);
                                     cardBody.append(starPara, rating);
+
+                                    // Add "Add to Cart" button here
+                                    var addToCartBtn = $("<button class='btn btn-primary add-to-cart-btn' data-movie-id='"  + movie.id + "' data-movie-title='" + movie.title +"'>Add to Cart</button>");
+                                    cardBody.append(addToCartBtn);
+
                                     card.append(cardBody);
                                     col.append(card);
                                     genreMovies.append(col);
@@ -348,6 +396,10 @@
                                 }
                                 var starPara = $("<p class='card-text'>").html(starsText);
                                 cardBody.append(starPara, rating);
+
+                                // Add "Add to Cart" button here
+                                var addToCartBtn = $("<button class='btn btn-primary add-to-cart-btn' data-movie-id='"  + movie.id + "' data-movie-title='" + movie.title +"'>Add to Cart</button>");
+                                cardBody.append(addToCartBtn);
 
                                 card.append(cardBody);
                                 col.append(card);
