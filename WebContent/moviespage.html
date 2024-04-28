@@ -133,10 +133,29 @@
                                 var year = $("<p class='card-text'>Year: " + result.year + "</p>");
                                 var rating = $("<p class='card-text'>Rating: " + result.rating + "</p>");
 
-                                cardContent.append(titleLink, director, year, rating);
+                                cardContent.append(titleLink, year, director);
+
+                                var genresText = "Genres: ";
+                                for (var i = 0; i < result.genres.length; i++) {
+                                    var genre = result.genres[i];
+                                    var genreLink = $('<a>').attr('href', 'singlegenrepage.html?id=' + encodeURIComponent(genre.id)).text(genre.name);
+                                    genresText += (i > 0 ? ", " : "") + genreLink.prop('outerHTML');
+                                }
+                                var genrePara = $("<p class='card-text'>").html(genresText);
+                                cardContent.append(genrePara);
+
+                                var starsText = "Stars: ";
+                                for (var i = 0; i < result.stars.length; i++) {
+                                    var star = result.stars[i];
+                                    var starLink = $('<a>').attr('href', 'singlestarpage.html?id=' + encodeURIComponent(star.id)).text(star.name);
+                                    starsText += (i > 0 ? ", " : "") + starLink.prop('outerHTML');
+                                }
+                                var starPara = $("<p class='card-text'>").html(starsText);
+                                cardContent.append(starPara, rating);
                                 cardBody.append(cardContent);
                                 card.append(cardBody);
                                 searchResultsContainer.append(card);
+
                             });
                         }
                     }
@@ -202,7 +221,27 @@
                                     var year = $("<p class='card-text'>Year: " + movie.year + "</p>");
                                     var rating = $("<p class='card-text'>Rating: " + movie.rating + "</p>");
 
-                                    cardBody.append(titleLink, director, year, rating);
+                                    cardBody.append(titleLink, director, year);
+
+                                    // Genres
+                                    var genresText = "Genres: ";
+                                    for (var i = 0; i < movie.genres.length; i++) {
+                                        var genre = movie.genres[i];
+                                        var genreLink = $('<a>').attr('href', 'singlegenrepage.html?id=' + encodeURIComponent(genre.id)).text(genre.name);
+                                        genresText += (i > 0 ? ", " : "") + genreLink.prop('outerHTML');
+                                    }
+                                    var genrePara = $("<p class='card-text'>").html(genresText);
+                                    cardBody.append(genrePara);
+
+                                    // Stars
+                                    var starsText = "Stars: ";
+                                    for (var i = 0; i < movie.stars.length; i++) {
+                                        var star = movie.stars[i];
+                                        var starLink = $('<a>').attr('href', 'singlestarpage.html?id=' + encodeURIComponent(star.id)).text(star.name);
+                                        starsText += (i > 0 ? ", " : "") + starLink.prop('outerHTML');
+                                    }
+                                    var starPara = $("<p class='card-text'>").html(starsText);
+                                    cardBody.append(starPara, rating);
                                     card.append(cardBody);
                                     col.append(card);
                                     genreMovies.append(col);
@@ -288,10 +327,32 @@
                                 var year = $('<p class="card-text">Year: ' + movie.year + '</p>');
                                 var rating = $('<p class="card-text">Rating: ' + movie.rating + '</p>');
 
-                                cardBody.append(title, director, year, rating);
+                                cardBody.append(title, director, year);
+
+                                // Genres
+                                var genresText = "Genres: ";
+                                for (var i = 0; i < movie.genres.length; i++) {
+                                    var genre = movie.genres[i];
+                                    var genreLink = $('<a>').attr('href', 'singlegenrepage.html?id=' + encodeURIComponent(genre.id)).text(genre.name);
+                                    genresText += (i > 0 ? ", " : "") + genreLink.prop('outerHTML');
+                                }
+                                var genrePara = $("<p class='card-text'>").html(genresText);
+                                cardBody.append(genrePara);
+
+                                // Stars
+                                var starsText = "Stars: ";
+                                for (var i = 0; i < movie.stars.length; i++) {
+                                    var star = movie.stars[i];
+                                    var starLink = $('<a>').attr('href', 'singlestarpage.html?id=' + encodeURIComponent(star.id)).text(star.name);
+                                    starsText += (i > 0 ? ", " : "") + starLink.prop('outerHTML');
+                                }
+                                var starPara = $("<p class='card-text'>").html(starsText);
+                                cardBody.append(starPara, rating);
+
                                 card.append(cardBody);
                                 col.append(card);
                                 row.append(col);
+
                             });
 
                             movieList.append(row);

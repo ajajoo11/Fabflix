@@ -16,6 +16,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 @WebServlet(name = "singlegenreservlet", urlPatterns = "/singlegenrepage")
 public class singlegenreservlet extends HttpServlet {
@@ -52,18 +56,22 @@ public class singlegenreservlet extends HttpServlet {
             pageNumber = Integer.parseInt(pageNumberParam);
         }
 
-
         if (genreId == null || genreId.isEmpty() || sortOption == null || sortOption.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
 
         try (Connection connection = dataSource.getConnection()) {
-            String query = "SELECT m.id, m.title, m.year, m.director, r.rating " +
+            String query = "SELECT m.id, m.title, m.year, m.director, r.rating, GROUP_CONCAT(DISTINCT CONCAT(g.id, ':', g.name) ORDER BY g.name SEPARATOR ',') AS genres, GROUP_CONCAT(DISTINCT CONCAT(s.id, ':', s.name) ORDER BY s.name SEPARATOR ',') AS stars "
+                    +
                     "FROM movies m " +
                     "JOIN genres_in_movies gim ON m.id = gim.movieId " +
                     "LEFT JOIN ratings r ON m.id = r.movieId " +
+                    "LEFT JOIN genres g ON gim.genreId = g.id " +
+                    "LEFT JOIN stars_in_movies sim ON m.id = sim.movieId " +
+                    "LEFT JOIN stars s ON sim.starId = s.id " +
                     "WHERE gim.genreId = ? " +
+                    "GROUP BY m.id " +
                     "ORDER BY ";
 
             switch (sortOption) {
@@ -105,7 +113,7 @@ public class singlegenreservlet extends HttpServlet {
                 statement.setString(1, genreId);
                 statement.setInt(2, pageSize);
                 statement.setInt(3, offset);
-
+                System.out.println(query);
                 try (ResultSet resultSet = statement.executeQuery()) {
                     JsonArray moviesArray = new JsonArray();
                     while (resultSet.next()) {
@@ -115,6 +123,59 @@ public class singlegenreservlet extends HttpServlet {
                         movieObject.addProperty("director", resultSet.getString("director"));
                         movieObject.addProperty("id", resultSet.getString("id"));
                         movieObject.addProperty("rating", resultSet.getFloat("rating"));
+
+                        String genresString = resultSet.getString("genres");
+                        JsonArray genresArray = new JsonArray();
+                        if (genresString != null) {
+                            String[] genres = genresString.split(",");
+                            for (String genre : genres) {
+                                String[] genreInfo = genre.split(":");
+                                JsonObject genreObject = new JsonObject();
+                                genreObject.addProperty("id", genreInfo[0]);
+                                genreObject.addProperty("name", genreInfo[1]);
+                                genresArray.add(genreObject);
+                            }
+                        }
+                        movieObject.add("genres", genresArray);
+
+                        // Retrieve stars
+                        String starsString = resultSet.getString("stars");
+                        List<JsonObject> starsList = new ArrayList<>();
+                        if (starsString != null) {
+                            String[] stars = starsString.split(",");
+                            for (String star : stars) {
+                                String[] starInfo = star.split(":");
+                                JsonObject starObject = new JsonObject();
+                                starObject.addProperty("id", starInfo[0]);
+                                starObject.addProperty("name", starInfo[1]);
+                                starsList.add(starObject);
+                            }
+                        }
+                        Collections.sort(starsList, new Comparator<JsonObject>() {
+                            @Override
+                            public int compare(JsonObject star1, JsonObject star2) {
+                                int movieCountComparison = Integer.compare(
+                                        getStarMovieCount(star2.get("id").getAsString()),
+                                        getStarMovieCount(star1.get("id").getAsString()));
+                                if (movieCountComparison != 0) {
+                                    return movieCountComparison;
+                                }
+                                // If movie counts are equal, compare alphabetically
+                                return star1.get("name").getAsString().compareTo(star2.get("name").getAsString());
+                            }
+                        });
+
+                        JsonArray starsArray = new JsonArray();
+                        int count = 0;
+                        for (JsonObject star : starsList) {
+                            if (count < 3) {
+                                starsArray.add(star);
+                                count++;
+                            } else {
+                                break;
+                            }
+                        }
+                        movieObject.add("stars", starsArray);
                         moviesArray.add(movieObject);
                     }
                     PrintWriter out = response.getWriter();
@@ -126,6 +187,22 @@ public class singlegenreservlet extends HttpServlet {
         } catch (SQLException e) {
             e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    private int getStarMovieCount(String starId) {
+        try (Connection conn = dataSource.getConnection()) {
+            String query = "SELECT COUNT(*) AS movieCount FROM stars_in_movies WHERE starId = ?";
+            PreparedStatement statement = conn.prepareStatement(query);
+            statement.setString(1, starId);
+            ResultSet rs = statement.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("movieCount");
+            }
+            return 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return 0;
         }
     }
 

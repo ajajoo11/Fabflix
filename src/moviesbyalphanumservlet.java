@@ -14,6 +14,11 @@ import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 @WebServlet(name = "moviesbyalphanumservlet", urlPatterns = "/moviesbyalphanum")
 public class moviesbyalphanumservlet extends HttpServlet {
@@ -59,8 +64,8 @@ public class moviesbyalphanumservlet extends HttpServlet {
         }
 
         try (Connection conn = dataSource.getConnection();
-             PreparedStatement pstmt = buildPreparedStatement(conn, character, sortOption, pageSize, pageNumber);
-             ResultSet rs = pstmt.executeQuery()) {
+                PreparedStatement pstmt = buildPreparedStatement(conn, character, sortOption, pageSize, pageNumber);
+                ResultSet rs = pstmt.executeQuery()) {
 
             JsonArray jsonArray = new JsonArray();
             while (rs.next()) {
@@ -70,6 +75,59 @@ public class moviesbyalphanumservlet extends HttpServlet {
                 jsonObject.addProperty("year", rs.getInt("year"));
                 jsonObject.addProperty("director", rs.getString("director"));
                 jsonObject.addProperty("rating", rs.getDouble("rating"));
+
+                String genresString = rs.getString("genres");
+                JsonArray genresArray = new JsonArray();
+                if (genresString != null) {
+                    String[] genres = genresString.split(",");
+                    for (String genre : genres) {
+                        String[] genreInfo = genre.split(":");
+                        JsonObject genreObject = new JsonObject();
+                        genreObject.addProperty("id", genreInfo[0]);
+                        genreObject.addProperty("name", genreInfo[1]);
+                        genresArray.add(genreObject);
+                    }
+                }
+                jsonObject.add("genres", genresArray);
+
+                // Retrieve stars
+                String starsString = rs.getString("stars");
+                List<JsonObject> starsList = new ArrayList<>();
+                if (starsString != null) {
+                    String[] stars = starsString.split(",");
+                    for (String star : stars) {
+                        String[] starInfo = star.split(":");
+                        JsonObject starObject = new JsonObject();
+                        starObject.addProperty("id", starInfo[0]);
+                        starObject.addProperty("name", starInfo[1]);
+                        starsList.add(starObject);
+                    }
+                }
+                Collections.sort(starsList, new Comparator<JsonObject>() {
+                    @Override
+                    public int compare(JsonObject star1, JsonObject star2) {
+                        int movieCountComparison = Integer.compare(
+                                getStarMovieCount(star2.get("id").getAsString()),
+                                getStarMovieCount(star1.get("id").getAsString()));
+                        if (movieCountComparison != 0) {
+                            return movieCountComparison;
+                        }
+                        // If movie counts are equal, compare alphabetically
+                        return star1.get("name").getAsString().compareTo(star2.get("name").getAsString());
+                    }
+                });
+
+                JsonArray starsArray = new JsonArray();
+                int count = 0;
+                for (JsonObject star : starsList) {
+                    if (count < 3) {
+                        starsArray.add(star);
+                        count++;
+                    } else {
+                        break; // Exit loop once three stars are added
+                    }
+                }
+                jsonObject.add("stars", starsArray);
 
                 jsonArray.add(jsonObject);
             }
@@ -89,7 +147,8 @@ public class moviesbyalphanumservlet extends HttpServlet {
         }
     }
 
-    private PreparedStatement buildPreparedStatement(Connection conn, String character, String sortOption, int pageSize, int pageNumber) throws Exception {
+    private PreparedStatement buildPreparedStatement(Connection conn, String character, String sortOption, int pageSize,
+            int pageNumber) throws Exception {
         String query;
         String orderBy;
 
@@ -130,18 +189,32 @@ public class moviesbyalphanumservlet extends HttpServlet {
         }
 
         if (character.equals("*")) {
-            query = "SELECT m.id, m.title, m.year, m.director, r.rating " +
-                    "FROM movies m " +
-                    "LEFT JOIN ratings r ON m.id = r.movieId " +
-                    "WHERE LOWER(m.title) REGEXP '^[^a-z0-9]' " +
-                    orderBy;
+            query = "SELECT m.id, m.title, m.year, m.director, r.rating, "
+                    + "GROUP_CONCAT(DISTINCT CONCAT(g.id, ':', g.name) ORDER BY g.name SEPARATOR ',') AS genres, "
+                    + "GROUP_CONCAT(DISTINCT CONCAT(s.id, ':', s.name) ORDER BY s.name SEPARATOR ',') AS stars "
+                    + "FROM movies m "
+                    + "LEFT JOIN ratings r ON m.id = r.movieId "
+                    + "LEFT JOIN genres_in_movies gim ON m.id = gim.movieId "
+                    + "LEFT JOIN genres g ON gim.genreId = g.id "
+                    + "LEFT JOIN stars_in_movies sim ON m.id = sim.movieId "
+                    + "LEFT JOIN stars s ON sim.starId = s.id "
+                    + "WHERE LOWER(m.title) REGEXP '^[^a-z0-9]' "
+                    + "GROUP BY m.id "
+                    + orderBy;
         } else {
             character = character.toLowerCase() + "%";
-            query = "SELECT m.id, m.title, m.year, m.director, r.rating " +
-                    "FROM movies m " +
-                    "LEFT JOIN ratings r ON m.id = r.movieId " +
-                    "WHERE LOWER(m.title) LIKE ? " +
-                    orderBy;
+            query = "SELECT m.id, m.title, m.year, m.director, r.rating, "
+                    + "GROUP_CONCAT(DISTINCT CONCAT(g.id, ':', g.name) ORDER BY g.name SEPARATOR ',') AS genres, "
+                    + "GROUP_CONCAT(DISTINCT CONCAT(s.id, ':', s.name) ORDER BY s.name SEPARATOR ',') AS stars "
+                    + "FROM movies m "
+                    + "LEFT JOIN ratings r ON m.id = r.movieId "
+                    + "LEFT JOIN genres_in_movies gim ON m.id = gim.movieId "
+                    + "LEFT JOIN genres g ON gim.genreId = g.id "
+                    + "LEFT JOIN stars_in_movies sim ON m.id = sim.movieId "
+                    + "LEFT JOIN stars s ON sim.starId = s.id "
+                    + "WHERE LOWER(m.title) LIKE ? "
+                    + "GROUP BY m.id "
+                    + orderBy;
         }
 
         // Calculate offset based on page size and page number
@@ -161,5 +234,21 @@ public class moviesbyalphanumservlet extends HttpServlet {
         }
 
         return pstmt;
+    }
+
+    private int getStarMovieCount(String starId) {
+        try (Connection conn = dataSource.getConnection()) {
+            String query = "SELECT COUNT(*) AS movieCount FROM stars_in_movies WHERE starId = ?";
+            PreparedStatement statement = conn.prepareStatement(query);
+            statement.setString(1, starId);
+            ResultSet rs = statement.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("movieCount");
+            }
+            return 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return 0;
+        }
     }
 }
