@@ -24,13 +24,7 @@ public class paymentservlet extends HttpServlet {
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
-        System.out.println("Session ID: " + session.getId()); // Debugging: Print session ID
-        System.out.println("Session Attributes: " + session.getAttributeNames()); // Debugging: Print session attributes
 
-        if (session.getAttribute("logged_in") == null || !(boolean) session.getAttribute("logged_in")) {
-            response.sendRedirect("login");
-            return;
-        }
         String firstName = request.getParameter("firstName");
         String lastName = request.getParameter("lastName");
         String creditCardNumber = request.getParameter("creditCardNumber");
