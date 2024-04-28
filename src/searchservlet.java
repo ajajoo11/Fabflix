@@ -42,55 +42,80 @@ public class searchservlet extends HttpServlet {
         int pageNumber = Integer.parseInt(request.getParameter("pageNumber"));
 
         try (Connection conn = dataSource.getConnection()) {
-            String query = "SELECT m.id, m.title, m.year, m.director, r.rating " +
-                    "FROM movies m " +
-                    "LEFT JOIN ratings r ON m.id = r.movieId " +
-                    "WHERE m.title LIKE ? " +
-                    "AND m.director LIKE ? " +
-                    "AND m.year LIKE ? ";
-//                    "AND m.star LIKE ? ";
+            StringBuilder queryBuilder = new StringBuilder();
+            queryBuilder.append("SELECT DISTINCT m.*, r.rating FROM movies m ");
+            queryBuilder.append("LEFT JOIN ratings r ON m.id = r.movieId ");
+            queryBuilder.append("LEFT JOIN stars_in_movies sm ON m.id = sm.movieId ");
+            queryBuilder.append("LEFT JOIN stars s ON sm.starId = s.id ");
+            queryBuilder.append("WHERE ");
 
+            if (title != null && !title.isEmpty()) {
+                queryBuilder.append("m.title LIKE ? AND ");
+            }
+            if (director != null && !director.isEmpty()) {
+                queryBuilder.append("m.director LIKE ? AND ");
+            }
+            if (year != null && !year.isEmpty()) {
+                queryBuilder.append("m.year = ? AND ");
+            }
+            if (star != null && !star.isEmpty()) {
+                queryBuilder.append("s.name LIKE ? AND ");
+            }
+
+            queryBuilder.append("1=1"); // Add a dummy condition to ensure the query is valid
+
+            // Sort options
             switch (sortOption) {
                 case "title_asc_rating_desc":
-                    query += "ORDER BY m.title ASC, r.rating DESC";
+                    queryBuilder.append(" ORDER BY m.title ASC, r.rating DESC");
                     break;
                 case "title_asc_rating_asc":
-                    query += "ORDER BY m.title ASC, r.rating ASC";
+                    queryBuilder.append(" ORDER BY m.title ASC, r.rating ASC");
                     break;
                 case "title_desc_rating_desc":
-                    query += "ORDER BY m.title DESC, r.rating DESC";
+                    queryBuilder.append(" ORDER BY m.title DESC, r.rating DESC");
                     break;
                 case "title_desc_rating_asc":
-                    query += "ORDER BY m.title DESC, r.rating ASC";
+                    queryBuilder.append(" ORDER BY m.title DESC, r.rating ASC");
                     break;
                 case "rating_asc_title_desc":
-                    query += "ORDER BY r.rating ASC, m.title DESC";
+                    queryBuilder.append(" ORDER BY r.rating ASC, m.title DESC");
                     break;
                 case "rating_asc_title_asc":
-                    query += "ORDER BY r.rating ASC, m.title ASC";
+                    queryBuilder.append(" ORDER BY r.rating ASC, m.title ASC");
                     break;
                 case "rating_desc_title_desc":
-                    query += "ORDER BY r.rating DESC, m.title DESC";
+                    queryBuilder.append(" ORDER BY r.rating DESC, m.title DESC");
                     break;
                 case "rating_desc_title_asc":
-                    query += "ORDER BY r.rating DESC, m.title ASC";
+                    queryBuilder.append(" ORDER BY r.rating DESC, m.title ASC");
                     break;
                 default:
-                    query += "ORDER BY m.title ASC, r.rating DESC"; // Default sorting
+                    queryBuilder.append(" ORDER BY r.rating DESC"); // Default sorting
                     break;
             }
 
-            query += " LIMIT ? OFFSET ?";
+            queryBuilder.append(" LIMIT ? OFFSET ?");
 
-            PreparedStatement pstmt = conn.prepareStatement(query);
-            pstmt.setString(1, "%" + title + "%");
-            pstmt.setString(2, "%" + director + "%");
-            pstmt.setString(3, "%" + year + "%");
-//            pstmt.setString(4, "%" + star + "%");
-            pstmt.setInt(4, pageSize);
-            pstmt.setInt(5, (pageNumber - 1) * pageSize);
+            PreparedStatement statement = conn.prepareStatement(queryBuilder.toString());
+            int parameterIndex = 1;
 
-            ResultSet rs = pstmt.executeQuery();
+            if (title != null && !title.isEmpty()) {
+                statement.setString(parameterIndex++, "%" + title + "%");
+            }
+            if (director != null && !director.isEmpty()) {
+                statement.setString(parameterIndex++, "%" + director + "%");
+            }
+            if (year != null && !year.isEmpty()) {
+                statement.setInt(parameterIndex++, Integer.parseInt(year));
+            }
+            if (star != null && !star.isEmpty()) {
+                statement.setString(parameterIndex++, "%" + star + "%");
+            }
+            statement.setInt(parameterIndex++, pageSize);
+            statement.setInt(parameterIndex++, (pageNumber - 1) * pageSize);
+
+            ResultSet rs = statement.executeQuery();
             JsonArray searchResultsArray = new JsonArray();
 
             while (rs.next()) {
@@ -99,11 +124,11 @@ public class searchservlet extends HttpServlet {
                 resultObject.addProperty("title", rs.getString("title"));
                 resultObject.addProperty("year", rs.getInt("year"));
                 resultObject.addProperty("director", rs.getString("director"));
-                resultObject.addProperty("rating", rs.getDouble("rating"));
+                resultObject.addProperty("rating", rs.getFloat("rating"));
                 searchResultsArray.add(resultObject);
             }
             rs.close();
-            pstmt.close();
+            statement.close();
 
             out.write(searchResultsArray.toString());
             response.setStatus(200);
@@ -117,5 +142,6 @@ public class searchservlet extends HttpServlet {
         } finally {
             out.close();
         }
+
     }
 }
