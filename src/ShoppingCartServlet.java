@@ -1,15 +1,38 @@
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.HashMap;
-import java.util.Map;
+import javax.sql.DataSource;
 
 @WebServlet(name = "ShoppingCartServlet", urlPatterns = "/cart")
 public class ShoppingCartServlet extends HttpServlet {
+
+    private DataSource dataSource;
+
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        try {
+            Context initContext = new InitialContext();
+            Context envContext = (Context) initContext.lookup("java:/comp/env");
+            dataSource = (DataSource) envContext.lookup("jdbc/moviedb"); // Replace with your DataSource name
+        } catch (NamingException e) {
+            e.printStackTrace();
+            throw new ServletException("Error initializing DataSource", e);
+        }
+    }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("text/html");
@@ -29,8 +52,8 @@ public class ShoppingCartServlet extends HttpServlet {
         out.println("<table border=\"1\">");
         out.println("<tr><th>Movie Title</th><th>Quantity</th><th>Price</th></tr>");
 
-        // Retrieve movie details (such as title and price) based on movie IDs or titles stored in the cart
-        // Replace this with logic to fetch movie details from the database
+        // Retrieve movie details (such as title and price) based on movie IDs or titles
+        // stored in the cart
         Map<String, Double> movieDetails = getMovieDetails(cart);
 
         // Iterate over each item in the cart and display its details
@@ -55,21 +78,64 @@ public class ShoppingCartServlet extends HttpServlet {
         out.close();
     }
 
-    // Method to retrieve movie details (such as title and price) based on movie IDs or titles stored in the cart
-    // Replace this with logic to fetch movie details from the database
     private Map<String, Double> getMovieDetails(Map<String, Integer> cart) {
-        // Dummy implementation - replace with actual database query
         Map<String, Double> movieDetails = new HashMap<>();
-        movieDetails.put("Movie Title 1", 10.0); // Example: Movie Title 1 with price $10
-        movieDetails.put("Movie Title 2", 15.0); // Example: Movie Title 2 with price $15
-        // Add more movie details as needed
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = dataSource.getConnection();
+
+            // Prepare SQL query to fetch movie prices based on movie titles
+            StringBuilder sql = new StringBuilder();
+            sql.append("SELECT title, price FROM movies WHERE title IN (");
+            for (String movieTitle : cart.keySet()) {
+                sql.append("?,");
+            }
+            sql.deleteCharAt(sql.length() - 1); // Remove the last comma
+            sql.append(")");
+
+            pstmt = conn.prepareStatement(sql.toString());
+
+            // Set movie titles as parameters for the prepared statement
+            int parameterIndex = 1;
+            for (String movieTitle : cart.keySet()) {
+                pstmt.setString(parameterIndex++, movieTitle);
+            }
+
+            // Execute the query
+            rs = pstmt.executeQuery();
+
+            // Populate movie details map with retrieved prices
+            while (rs.next()) {
+                String title = rs.getString("title");
+                double price = rs.getDouble("price");
+                movieDetails.put(title, price);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+                if (pstmt != null) {
+                    pstmt.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
         return movieDetails;
     }
 
-    // Method to calculate the total price of items in the cart
     private double calculateTotalPrice(Map<String, Integer> cart, Map<String, Double> movieDetails) {
         double totalPrice = 0.0;
-        // Iterate over each item in the cart and calculate its total price
         for (Map.Entry<String, Integer> entry : cart.entrySet()) {
             String movieTitle = entry.getKey();
             int quantity = entry.getValue();
