@@ -82,50 +82,92 @@
             if (titleParam !== '' || directorParam !== '' || yearParam !== '' || starParam !== '') {
                 // Script for title parameter
                 $(document).ready(function () {
+                    var pageNumber = 1; // Initialize page number
+                    var pageSize = 10; // Default page size
+
+                    // Function to fetch search results with sorting and pagination parameters
                     function fetchSearchResults() {
-                        let urlParams = new URLSearchParams(window.location.search);
-                        let title = urlParams.get('title');
-                        let director = urlParams.get('director');
-                        let year = urlParams.get('year');
-                        let star = urlParams.get('star');
+                        var title = getUrlParameter('title');
+                        var director = getUrlParameter('director');
+                        var year = getUrlParameter('year');
+                        var star = getUrlParameter('star');
+                        var sortOption = $('#sortOption').val();
 
                         $.ajax({
-                            url: "searchresults",
-                            method: "GET",
-                            data: { title: title, director: director, year: year, star: star },
-                            dataType: "json",
-                            success: function (data) {
-                                displaySearchResults(data);
+                            url: 'searchresults',
+                            method: 'GET',
+                            data: {
+                                title: title,
+                                director: director,
+                                year: year,
+                                star: star,
+                                sort_option: sortOption,
+                                pageSize: pageSize,
+                                pageNumber: pageNumber
+                            },
+                            dataType: 'json',
+                            success: function (searchResults) {
+                                displaySearchResults(searchResults);
                             },
                             error: function (xhr, status, error) {
-                                console.error("Error fetching search results:", status, error);
-                                $("#searchResults").html("<p>Error fetching search results. Please try again later.</p>");
+                                console.error('Error fetching search results:', status, error);
+                                alert('Failed to fetch search results. Please try again later.');
                             }
                         });
                     }
 
-                    function displaySearchResults(results) {
-                        $("#searchResults").empty();
-                        if (results.length > 0) {
-                            $.each(results, function (index, result) {
-                                var col = $('<div class="col-md-4 mb-4">');
-                                var card = $('<div class="card">');
-                                var cardBody = $('<div class="card-body">');
-                                var titleLink = $('<a>').attr('href', 'singlemoviepage.html?id=' + encodeURIComponent(result.id)).text(result.title);
-                                var director = $("<p class='card-text'>Director: " + result.director + "</p>");
-                                var year = $("<p class='card-text'>Year: " + result.year + "</p>");
-                                var rating = $("<p class='card-text'>Rating: " + result.rating + "</p>");
-                                cardBody.append(titleLink, director, year, rating);
-                                card.append(cardBody);
-                                col.append(card);
-                                $('#searchResults').append(col);
-                            });
+                    // Function to display search results
+                    function displaySearchResults(searchResults) {
+                        var searchResultsContainer = $('#genreMovies');
+                        searchResultsContainer.empty(); // Clear existing search results
+
+                        if (searchResults.length === 0) {
+                            searchResultsContainer.html("<p class='text-muted'>No results found.</p>");
                         } else {
-                            $("#searchResults").html("<p>No results found.</p>");
+                            $.each(searchResults, function (index, result) {
+                                var resultHtml = "<a href='singlemoviepage.html?id=" + result.id + "' class='list-group-item list-group-item-action'>" +
+                                    "<h5 class='mb-1'>" + result.title + "</h5>" +
+                                    "<p class='mb-1'>Director: " + result.director + "</p>" +
+                                    "<small>Year: " + result.year + " | Rating: " + result.rating + "</small>" +
+                                    "</a>";
+
+                                searchResultsContainer.append(resultHtml);
+                            });
                         }
                     }
+
+                    // Function to get URL parameter
+                    function getUrlParameter(name) {
+                        name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+                        var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+                        var results = regex.exec(location.search);
+                        return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+                    }
+
+                    // Event listener for sorting option change
+                    $('#sort_option, #page_size').change(function () {
+                        pageNumber = 1; // Reset page number to 1 when sorting or page size is changed
+                        pageSize = parseInt($('#page_size').val());
+                        fetchSearchResults(); // Fetch search results with updated parameters
+                    });
+
+                    // Event listeners for Previous and Next buttons
+                    $('#prev_btn').click(function () {
+                        if (pageNumber > 1) {
+                            pageNumber--;
+                            fetchSearchResults(); // Fetch search results with updated page number
+                        }
+                    });
+
+                    $('#next_btn').click(function () {
+                        pageNumber++;
+                        fetchSearchResults(); // Fetch search results with updated page number
+                    });
+
+                    // Fetch search results with default parameters and sorting on page load
                     fetchSearchResults();
                 });
+
             } else if (idParam !== '') {
                 $(document).ready(function () {
                     var pageNumber = 1; // Initialize page number
