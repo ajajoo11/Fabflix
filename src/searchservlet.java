@@ -37,44 +37,60 @@ public class searchservlet extends HttpServlet {
         String director = request.getParameter("director");
         String year = request.getParameter("year");
         String star = request.getParameter("star");
+        String sortOption = request.getParameter("sort_option");
+        int pageSize = Integer.parseInt(request.getParameter("pageSize"));
+        int pageNumber = Integer.parseInt(request.getParameter("pageNumber"));
 
         try (Connection conn = dataSource.getConnection()) {
-            StringBuilder queryBuilder = new StringBuilder();
-            queryBuilder.append("SELECT m.*, r.rating FROM movies m LEFT JOIN ratings r ON m.id = r.movieId WHERE ");
+            String query = "SELECT m.id, m.title, m.year, m.director, r.rating " +
+                    "FROM movies m " +
+                    "LEFT JOIN ratings r ON m.id = r.movieId " +
+                    "WHERE m.title LIKE ? " +
+                    "AND m.director LIKE ? " +
+                    "AND m.year LIKE ? ";
+//                    "AND m.star LIKE ? ";
 
-            if (title != null && !title.isEmpty()) {
-                queryBuilder.append("m.title LIKE ? AND ");
-            }
-            if (director != null && !director.isEmpty()) {
-                queryBuilder.append("m.director LIKE ? AND ");
-            }
-            if (year != null && !year.isEmpty()) {
-                queryBuilder.append("m.year = ? AND ");
-            }
-            if (star != null && !star.isEmpty()) {
-                queryBuilder.append("m.star LIKE ? AND ");
-            }
-
-            queryBuilder.append("1=1"); // Add a dummy condition to ensure the query is valid
-            queryBuilder.append(" ORDER BY r.rating DESC"); // Optionally, you can order the results by rating
-
-            PreparedStatement statement = conn.prepareStatement(queryBuilder.toString());
-            int parameterIndex = 1;
-
-            if (title != null && !title.isEmpty()) {
-                statement.setString(parameterIndex++, "%" + title + "%");
-            }
-            if (director != null && !director.isEmpty()) {
-                statement.setString(parameterIndex++, "%" + director + "%");
-            }
-            if (year != null && !year.isEmpty()) {
-                statement.setInt(parameterIndex++, Integer.parseInt(year));
-            }
-            if (star != null && !star.isEmpty()) {
-                statement.setString(parameterIndex++, "%" + star + "%");
+            switch (sortOption) {
+                case "title_asc_rating_desc":
+                    query += "ORDER BY m.title ASC, r.rating DESC";
+                    break;
+                case "title_asc_rating_asc":
+                    query += "ORDER BY m.title ASC, r.rating ASC";
+                    break;
+                case "title_desc_rating_desc":
+                    query += "ORDER BY m.title DESC, r.rating DESC";
+                    break;
+                case "title_desc_rating_asc":
+                    query += "ORDER BY m.title DESC, r.rating ASC";
+                    break;
+                case "rating_asc_title_desc":
+                    query += "ORDER BY r.rating ASC, m.title DESC";
+                    break;
+                case "rating_asc_title_asc":
+                    query += "ORDER BY r.rating ASC, m.title ASC";
+                    break;
+                case "rating_desc_title_desc":
+                    query += "ORDER BY r.rating DESC, m.title DESC";
+                    break;
+                case "rating_desc_title_asc":
+                    query += "ORDER BY r.rating DESC, m.title ASC";
+                    break;
+                default:
+                    query += "ORDER BY m.title ASC, r.rating DESC"; // Default sorting
+                    break;
             }
 
-            ResultSet rs = statement.executeQuery();
+            query += " LIMIT ? OFFSET ?";
+
+            PreparedStatement pstmt = conn.prepareStatement(query);
+            pstmt.setString(1, "%" + title + "%");
+            pstmt.setString(2, "%" + director + "%");
+            pstmt.setString(3, "%" + year + "%");
+//            pstmt.setString(4, "%" + star + "%");
+            pstmt.setInt(4, pageSize);
+            pstmt.setInt(5, (pageNumber - 1) * pageSize);
+
+            ResultSet rs = pstmt.executeQuery();
             JsonArray searchResultsArray = new JsonArray();
 
             while (rs.next()) {
@@ -83,11 +99,11 @@ public class searchservlet extends HttpServlet {
                 resultObject.addProperty("title", rs.getString("title"));
                 resultObject.addProperty("year", rs.getInt("year"));
                 resultObject.addProperty("director", rs.getString("director"));
-                resultObject.addProperty("rating", rs.getFloat("rating"));
+                resultObject.addProperty("rating", rs.getDouble("rating"));
                 searchResultsArray.add(resultObject);
             }
             rs.close();
-            statement.close();
+            pstmt.close();
 
             out.write(searchResultsArray.toString());
             response.setStatus(200);
