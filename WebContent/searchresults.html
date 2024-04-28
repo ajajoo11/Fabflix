@@ -4,8 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Search Results</title>
-    <!-- Include necessary stylesheets -->
+    <title>Movies by Genre</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
         integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="css/moviepage.css">
@@ -14,43 +13,51 @@
 <body>
 
     <div class="container mt-5">
-        <div class="row">
-            <div class="col">
-                <h2 class="mb-4">Search Results</h2>
-                <div class="form-group">
-                    <label for="sortOption">Sort by:</label>
-                    <select class="form-control" id="sortOption">
-                        <option value="title_asc_rating_desc">Title (A-Z), Rating (High-Low)</option>
-                        <option value="title_asc_rating_asc">Title (A-Z), Rating (Low-High)</option>
-                        <option value="title_desc_rating_desc">Title (Z-A), Rating (High-Low)</option>
-                        <option value="title_desc_rating_asc">Title (Z-A), Rating (Low-High)</option>
-                        <option value="rating_asc_title_desc">Rating (Low-High), Title (Z-A)</option>
-                        <option value="rating_asc_title_asc">Rating (Low-High), Title (A-Z)</option>
-                        <option value="rating_desc_title_desc">Rating (High-Low), Title (Z-A)</option>
-                        <option value="rating_desc_title_asc">Rating (High-Low), Title (A-Z)</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="pageSize">Movies per Page:</label>
-                    <select class="form-control" id="pageSize">
-                        <option value="10">10</option>
-                        <option value="25">25</option>
-                        <option value="50">50</option>
-                        <option value="100">100</option>
-                    </select>
-                </div>
-                <div class="col-md-6 text-right">
-                    <button class="btn btn-primary" id="prev_btn">Previous</button>
-                    <button class="btn btn-primary ml-2" id="next_btn">Next</button>
-                </div>
-                <div id="searchResults" class="list-group">
-                    <!-- Search results will be displayed here -->
-                </div>
+        <h1 class="text-center mb-5">Movies by Genre</h1>
+
+        <!-- Sorting options -->
+        <div class="row mb-3">
+            <div class="col-md-12">
+                <label for="sort_option">Sort by:</label>
+                <select class="form-control" id="sort_option">
+                    <option value="title_asc_rating_desc">Title (Increasing) - Rating (Decreasing)</option>
+                    <option value="title_asc_rating_asc">Title (Increasing) - Rating (Increasing)</option>
+                    <option value="title_desc_rating_desc">Title (Decreasing) - Rating (Decreasing)</option>
+                    <option value="title_desc_rating_asc">Title (Decreasing) - Rating (Increasing)</option>
+                    <option value="rating_asc_title_desc">Rating (Increasing) - Title (Decreasing)</option>
+                    <option value="rating_asc_title_asc">Rating (Increasing) - Title (Increasing)</option>
+                    <option value="rating_desc_title_desc">Rating (Decreasing) - Title (Decreasing)</option>
+                    <option value="rating_desc_title_asc">Rating (Decreasing) - Title (Increasing)</option>
+                </select>
             </div>
+        </div>
+
+        <!-- Pagination controls -->
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="page_size">Movies per Page:</label>
+                <select class="form-control" id="page_size">
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+            </div>
+            <div class="col-md-6 text-right">
+                <button class="btn btn-primary" id="prev_btn">Previous</button>
+                <button class="btn btn-primary ml-2" id="next_btn">Next</button>
+            </div>
+        </div>
+
+        <div class="row" id="genreMovies">
+            <!-- Genre cards will be dynamically added here -->
         </div>
     </div>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
     <script>
         $(document).ready(function () {
             var pageNumber = 1; // Initialize page number
@@ -62,7 +69,7 @@
                 var director = getUrlParameter('director');
                 var year = getUrlParameter('year');
                 var star = getUrlParameter('star');
-                var sortOption = $('#sortOption').val();
+                var sortOption = $('#sort_option').val();
 
                 $.ajax({
                     url: 'searchresults',
@@ -87,22 +94,27 @@
                 });
             }
 
-            // Function to display search results
+            // Function to display search results as cards
             function displaySearchResults(searchResults) {
-                var searchResultsContainer = $('#searchResults');
+                var searchResultsContainer = $('#genreMovies');
                 searchResultsContainer.empty(); // Clear existing search results
 
                 if (searchResults.length === 0) {
-                    searchResultsContainer.html("<p class='text-muted'>No results found.</p>");
+                    searchResultsContainer.html("<p class='col-12 text-muted'>No results found.</p>");
                 } else {
                     $.each(searchResults, function (index, result) {
-                        var resultHtml = "<a href='singlemoviepage.html?id=" + result.id + "' class='list-group-item list-group-item-action'>" +
-                            "<h5 class='mb-1'>" + result.title + "</h5>" +
-                            "<p class='mb-1'>Director: " + result.director + "</p>" +
-                            "<small>Year: " + result.year + " | Rating: " + result.rating + "</small>" +
-                            "</a>";
+                        var card = $("<div class='col-md-4 mb-4'>");
+                        var cardBody = $("<div class='card'>");
+                        var cardContent = $("<div class='card-body'>");
+                        var titleLink = $('<a>').attr('href', 'singlemoviepage.html?id=' + encodeURIComponent(movie.id)).text(movie.title);
+                        var director = $("<p class='card-text'>Director: " + result.director + "</p>");
+                        var year = $("<p class='card-text'>Year: " + movie.year + "</p>");
+                        var rating = $("<p class='card-text'>Rating: " + movie.rating + "</p>");
 
-                        searchResultsContainer.append(resultHtml);
+                        cardContent.append(titleLink, director, year, rating);
+                        cardBody.append(cardContent);
+                        card.append(cardBody);
+                        searchResultsContainer.append(card);
                     });
                 }
             }
@@ -116,9 +128,9 @@
             }
 
             // Event listener for sorting option change
-            $('#sortOption, #pageSize').change(function () {
+            $('#sort_option, #page_size').change(function () {
                 pageNumber = 1; // Reset page number to 1 when sorting or page size is changed
-                pageSize = parseInt($('#pageSize').val());
+                pageSize = parseInt($('#page_size').val());
                 fetchSearchResults(); // Fetch search results with updated parameters
             });
 

@@ -91,7 +91,7 @@
                         var director = getUrlParameter('director');
                         var year = getUrlParameter('year');
                         var star = getUrlParameter('star');
-                        var sortOption = $('#sortOption').val();
+                        var sortOption = $('#sort_option').val();
 
                         $.ajax({
                             url: 'searchresults',
@@ -116,22 +116,27 @@
                         });
                     }
 
-                    // Function to display search results
+                    // Function to display search results as cards
                     function displaySearchResults(searchResults) {
                         var searchResultsContainer = $('#genreMovies');
                         searchResultsContainer.empty(); // Clear existing search results
 
                         if (searchResults.length === 0) {
-                            searchResultsContainer.html("<p class='text-muted'>No results found.</p>");
+                            searchResultsContainer.html("<p class='col-12 text-muted'>No results found.</p>");
                         } else {
                             $.each(searchResults, function (index, result) {
-                                var resultHtml = "<a href='singlemoviepage.html?id=" + result.id + "' class='list-group-item list-group-item-action'>" +
-                                    "<h5 class='mb-1'>" + result.title + "</h5>" +
-                                    "<p class='mb-1'>Director: " + result.director + "</p>" +
-                                    "<small>Year: " + result.year + " | Rating: " + result.rating + "</small>" +
-                                    "</a>";
+                                var card = $("<div class='col-md-4 mb-4'>");
+                                var cardBody = $("<div class='card'>");
+                                var cardContent = $("<div class='card-body'>");
+                                var titleLink = $('<a>').attr('href', 'singlemoviepage.html?id=' + encodeURIComponent(result.id)).text(result.title);
+                                var director = $("<p class='card-text'>Director: " + result.director + "</p>");
+                                var year = $("<p class='card-text'>Year: " + result.year + "</p>");
+                                var rating = $("<p class='card-text'>Rating: " + result.rating + "</p>");
 
-                                searchResultsContainer.append(resultHtml);
+                                cardContent.append(titleLink, director, year, rating);
+                                cardBody.append(cardContent);
+                                card.append(cardBody);
+                                searchResultsContainer.append(card);
                             });
                         }
                     }
