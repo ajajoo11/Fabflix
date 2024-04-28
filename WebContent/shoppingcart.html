@@ -18,6 +18,7 @@
             <th>Quantity</th>
             <th>Price per Movie</th>
             <th>Total Price</th>
+            <th>Actions</th>
         </tr>
         </thead>
         <tbody id="cartItems">
@@ -34,47 +35,25 @@
 <!-- Include Bootstrap JS -->
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script>
+    // Function to fetch cart data from servlet and update the cart table
+    function fetchCartDataAndUpdate() {
+        $.ajax({
+            url: "cart", // URL of the servlet
+            type: "GET",
+            dataType: "json",
+            success: function(data) {
+                // Clear previous cart items
+                $('#cartItems').empty();
+                // Generate and append new cart rows
+                $('#cartItems').append(generateCartRows(data));
+            },
+            error: function(xhr, status, error) {
+                console.error("Error fetching cart data:", error);
+            }
+        });
+    }
+
     $(document).ready(function(){
-        // Function to fetch cart data from servlet and update the cart table
-        function fetchCartDataAndUpdate() {
-            $.ajax({
-                url: "cart", // URL of the servlet
-                type: "GET",
-                dataType: "json",
-                success: function(data) {
-                    // Clear previous cart items
-                    $('#cartItems').empty();
-                    // Generate and append new cart rows
-                    $('#cartItems').append(generateCartRows(data));
-                },
-                error: function(xhr, status, error) {
-                    console.error("Error fetching cart data:", error);
-                }
-            });
-        }
-
-        // Function to generate table rows for cart items
-        function generateCartRows(data) {
-            var rows = '';
-            data.forEach(function(item){
-                var totalPrice = item.price * item.quantity; // Calculate total price
-                rows += `
-            <tr>
-                <td>${item.title}</td>
-                <td>
-                    <button class="btn btn-sm btn-secondary" onclick="decreaseQuantity(this, '${item.title}')">-</button>
-                    <span class="quantity">${item.quantity}</span>
-                    <button class="btn btn-sm btn-secondary" onclick="increaseQuantity(this, '${item.title}')">+</button>
-                </td>
-                <td>$${item.price.toFixed(2)}</td>
-                <td>$${totalPrice.toFixed(2)}</td> <!-- Display total price -->
-            </tr>
-        `;
-            });
-            return rows;
-        }
-
-
         // Display cart items
         fetchCartDataAndUpdate();
 
@@ -85,6 +64,30 @@
             fetchCartDataAndUpdate(); // Update the cart after clicking the button
         });
     });
+
+    // Function to generate table rows for cart items
+    function generateCartRows(data) {
+        var rows = '';
+        data.forEach(function(item){
+            var totalPrice = item.price * item.quantity; // Calculate total price
+            rows += `
+                <tr>
+                    <td>${item.title}</td>
+                    <td>
+                        <button class="btn btn-sm btn-secondary" onclick="decreaseQuantity(this, '${item.title}')">-</button>
+                        <span class="quantity">${item.quantity}</span>
+                        <button class="btn btn-sm btn-secondary" onclick="increaseQuantity(this, '${item.title}')">+</button>
+                    </td>
+                    <td>$${item.price.toFixed(2)}</td>
+                    <td>$${totalPrice.toFixed(2)}</td> <!-- Display total price -->
+                    <td>
+                        <button class="btn btn-sm btn-danger" onclick="removeFromCart('${item.title}')">Remove</button>
+                    </td>
+                </tr>
+            `;
+        });
+        return rows;
+    }
 
     // Function to increase quantity
     function increaseQuantity(btn, title) {
@@ -108,12 +111,33 @@
         }
     }
 
+    // Function to remove item from cart
+    function removeFromCart(title) {
+        $.ajax({
+            url: "cart", // URL of the servlet to remove item from cart
+            type: "POST",
+            data: {
+                action: "remove",
+                title: title
+            },
+            success: function(response) {
+                console.log('Item removed from cart:', response);
+                // Fetch and update cart data after removal
+                fetchCartDataAndUpdate();
+            },
+            error: function(xhr, status, error) {
+                console.error("Error removing item from cart:", error);
+            }
+        });
+    }
+
     // Function to update cart in the backend
     function updateCart(title, quantity) {
         $.ajax({
             url: "cart", // URL of the servlet to update cart
             type: "POST",
             data: {
+                action: "add",
                 title: title,
                 quantity: quantity
             },
@@ -126,6 +150,7 @@
         });
     }
 </script>
+
 
 </body>
 </html>

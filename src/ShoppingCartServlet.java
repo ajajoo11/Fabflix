@@ -110,10 +110,18 @@ public class ShoppingCartServlet extends HttpServlet {
             cart = new HashMap<>();
         }
 
-        String movieTitle = request.getParameter("title");
-        int quantity = Integer.parseInt(request.getParameter("quantity"));
+        String action = request.getParameter("action");
+        if ("add".equals(action)) {
+            // Add item to the cart
+            String movieTitle = request.getParameter("title");
+            int quantity = Integer.parseInt(request.getParameter("quantity"));
+            cart.put(movieTitle, quantity);
+        } else if ("remove".equals(action)) {
+            // Remove item from the cart
+            String movieTitle = request.getParameter("title");
+            cart.remove(movieTitle);
+        }
 
-        cart.put(movieTitle, quantity);
         session.setAttribute("cart", cart);
 
         response.sendRedirect(request.getContextPath() + "/cart");
