@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shopping Cart</title>
     <!-- Include Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<!--    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">-->
     <link rel="stylesheet" type="text/css" href="css/shoppingcart.css">
 </head>
 <body>
@@ -25,7 +25,10 @@
         <!-- Cart items will be dynamically inserted here -->
         </tbody>
     </table>
+    <div id="totalPrice"></div> <!-- Display total price here -->
     <button id="updateCartBtn" class="btn btn-primary">Update Cart</button>
+    <button id="proceedToPaymentBtn" class="btn btn-success">Proceed to Payment</button>
+
 </div>
 
 <!-- Include jQuery -->
@@ -46,6 +49,8 @@
                 $('#cartItems').empty();
                 // Generate and append new cart rows
                 $('#cartItems').append(generateCartRows(data));
+                // Calculate and display total price
+                displayTotalPrice(data);
             },
             error: function(xhr, status, error) {
                 console.error("Error fetching cart data:", error);
@@ -62,6 +67,13 @@
             // Code to update the cart
             console.log('Cart updated');
             fetchCartDataAndUpdate(); // Update the cart after clicking the button
+        });
+
+        // Proceed to payment button click event
+        $('#proceedToPaymentBtn').click(function(){
+            // Code to proceed to payment
+            console.log('Proceeding to payment');
+            // Implement your payment logic here
         });
     });
 
@@ -148,6 +160,14 @@
                 console.error("Error updating cart:", error);
             }
         });
+    }
+
+    function displayTotalPrice(data) {
+        var totalPrice = 0;
+        data.forEach(function(item) {
+            totalPrice += item.price * item.quantity;
+        });
+        $('#totalPrice').text('Total Price: $' + totalPrice.toFixed(2));
     }
 </script>
 

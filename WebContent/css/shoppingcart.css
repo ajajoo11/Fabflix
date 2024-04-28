@@ -1,17 +1,17 @@
 body {
     font-family: Arial, sans-serif;
-    background-image: url('https://repository-images.githubusercontent.com/299409710/b42f7780-0fe1-11eb-8460-e459acd20fb4'); /* Replace 'your-image-url.jpg' with the URL or path to your background image */
-    background-size: cover; /* Cover the entire background */
+    background-image: url('https://repository-images.githubusercontent.com/299409710/b42f7780-0fe1-11eb-8460-e459acd20fb4');
+    background-size: cover;
     background-position: center;
     background-color: #141414;
     margin: 0;
     padding: 0;
-    color: #fff; /* Default text color for all elements */
+    color: #fff;
 }
 
 h1, h2 {
     text-align: center;
-    color: #fff; /* Heading color */
+    color: #fff;
 }
 
 form {
@@ -26,24 +26,39 @@ table {
 }
 
 table, th, td {
-    border: 1px solid #fff; /* Border color */
+    border: 1px solid #fff;
 }
 
 th, td {
     padding: 8px;
     text-align: left;
-    color: #fff; /* Table text color */
+    color: #fff;
 }
 
 tr:nth-child(even) {
-    background-color: rgba(255, 255, 255, 0.1); /* Alternate row background color */
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 a {
-    color: #fff; /* Links will have white color */
+    color: #fff;
     text-decoration: none;
 }
 
 a:hover {
-    color: #ccc; /* Change link color on hover */
+    color: #ccc;
+}
+
+/* Update the color of the buttons */
+.btn-primary, .btn-success {
+    background-color: #e50914;
+    border-color: #e50914;
+}
+
+/* Center and highlight the total price */
+#totalPrice {
+    text-align: center;
+    font-weight: bold;
+    font-size: 20px;
+    color: #e50914;
+    margin-top: 20px;
 }
