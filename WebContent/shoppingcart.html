@@ -1,27 +1,103 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shopping Cart</title>
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="css/shoppingcart.css">
 </head>
-
 <body>
-<h1>Shopping Cart</h1>
-<form action="/cart" method="get">
-    <input type="submit" value="View Cart">
-</form>
-<table border="1">
-    <tr>
-        <th>Movie Title</th>
-        <th>Quantity</th>
-        <th>Price</th>
-    </tr>
-    <!-- Servlet-generated content will be placed here -->
-</table>
-<h2>Total Price: $0.0</h2>
-</body>
+<div class="container">
+    <h1>Shopping Cart</h1>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Title</th>
+            <th>Quantity</th>
+            <th>Price per Movie</th>
+            <th>Total Price</th>
+        </tr>
+        </thead>
+        <tbody id="cartItems">
+        <!-- Cart items will be dynamically inserted here -->
+        </tbody>
+    </table>
+    <button id="updateCartBtn" class="btn btn-primary">Update Cart</button>
+</div>
 
+<!-- Include jQuery -->
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+<!-- Include Bootstrap JS -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    $(document).ready(function(){
+        // Function to fetch cart data from servlet and update the cart table
+        function fetchCartDataAndUpdate() {
+            $.ajax({
+                url: "cart", // URL of the servlet
+                type: "GET",
+                dataType: "json",
+                success: function(data) {
+                    // Clear previous cart items
+                    $('#cartItems').empty();
+                    // Generate and append new cart rows
+                    $('#cartItems').append(generateCartRows(data));
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error fetching cart data:", error);
+                }
+            });
+        }
+
+        // Function to generate table rows for cart items
+        function generateCartRows(data) {
+            var rows = '';
+            data.forEach(function(item){
+                rows += `
+                    <tr>
+                        <td>${item.title}</td>
+                        <td>
+                            <button class="btn btn-sm btn-secondary" onclick="decreaseQuantity(this)">-</button>
+                            <span class="quantity">${item.quantity}</span>
+                            <button class="btn btn-sm btn-secondary" onclick="increaseQuantity(this)">+</button>
+                        </td>
+                        <td>$${item.pricePerMovie}</td>
+                        <td>$${item.totalPrice}</td>
+                    </tr>
+                `;
+            });
+            return rows;
+        }
+
+        // Display cart items
+        fetchCartDataAndUpdate();
+
+        // Update cart button click event
+        $('#updateCartBtn').click(function(){
+            // Code to update the cart
+            console.log('Cart updated');
+            fetchCartDataAndUpdate(); // Update the cart after clicking the button
+        });
+    });
+
+    // Function to increase quantity
+    function increaseQuantity(btn) {
+        var quantity = parseInt($(btn).siblings('.quantity').text());
+        $(btn).siblings('.quantity').text(quantity + 1);
+    }
+
+    // Function to decrease quantity
+    function decreaseQuantity(btn) {
+        var quantity = parseInt($(btn).siblings('.quantity').text());
+        if (quantity > 1) {
+            $(btn).siblings('.quantity').text(quantity - 1);
+        }
+    }
+
+</script>
+</body>
 </html>
