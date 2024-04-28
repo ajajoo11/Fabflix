@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Page</title>
+</head>
+
+<body>
+    <h2>Payment Information</h2>
+    <p id="totalPrice">Total Price: $</p>
+
+    <!-- JavaScript to display error message if present -->
+
+
+    <form action="payment" method="post">
+        <input type="hidden" id="totalPriceInput" name="totalPrice">
+
+        <label for="firstName">First Name:</label>
+        <input type="text" id="firstName" name="firstName" required><br><br>
+
+        <label for="lastName">Last Name:</label>
+        <input type="text" id="lastName" name="lastName" required><br><br>
+
+        <label for="creditCardNumber">Credit Card Number:</label>
+        <input type="text" id="creditCardNumber" name="creditCardNumber" required><br><br>
+
+        <label for="expirationDate">Expiration Date:</label>
+        <input type="text" id="expirationDate" name="expirationDate" required><br><br>
+
+        <input type="submit" value="Place Order">
+    </form>
+
+    <p id="errorMessage" style="color: red;"></p>
+
+    <script>
+        // Function to get URL parameter by name
+        function getUrlParameter(name) {
+            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+            var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+            var results = regex.exec(location.search);
+            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+        }
+
+        // Get total price from URL parameter and display it
+        var totalPrice = getUrlParameter('totalprice');
+        document.getElementById('totalPrice').innerText += totalPrice;
+        document.getElementById('totalPriceInput').value = totalPrice; // Set value for hidden input field
+
+        // Check if URL has error parameter and display error message if it's 'invalid_credit_card'
+        var errorMessage = getUrlParameter('error');
+        if (errorMessage === 'invalid_credit_card') {
+            document.getElementById('errorMessage').innerText = 'Invalid credit card. Please try again.';
+        }
+    </script>
+</body>
+
+</html>
