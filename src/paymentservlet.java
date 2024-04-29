@@ -47,7 +47,8 @@ public class paymentservlet extends HttpServlet {
         } else {
             // If credit card is not valid, redirect back to payment page with an error
             // message
-            response.sendRedirect("payment.html?error=invalid_credit_card");
+            String errorUrl = "payment.html?error=invalid_credit_card&totalprice=" + totalPrice;
+            response.sendRedirect(errorUrl);
         }
     }
 

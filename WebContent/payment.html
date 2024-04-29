@@ -5,34 +5,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Payment Page</title>
+    <link rel="stylesheet" type="text/css" href="css/shoppingcart.css"> <!-- You can link your CSS file here -->
 </head>
 
 <body>
-    <h2>Payment Information</h2>
-    <p id="totalPrice">Total Price: $</p>
+    <div class="container">
+        <h2>Payment Information</h2>
+        <p id="totalPrice" class="total-price">Total Price: $</p>
 
-    <!-- JavaScript to display error message if present -->
+        <form action="payment" method="post" class="payment-form">
+            <input type="hidden" id="totalPriceInput" name="totalPrice">
 
+            <label for="firstName">First Name:</label>
+            <input type="text" id="firstName" name="firstName" required><br><br>
 
-    <form action="payment" method="post">
-        <input type="hidden" id="totalPriceInput" name="totalPrice">
+            <label for="lastName">Last Name:</label>
+            <input type="text" id="lastName" name="lastName" required><br><br>
 
-        <label for="firstName">First Name:</label>
-        <input type="text" id="firstName" name="firstName" required><br><br>
+            <label for="creditCardNumber">Credit Card Number:</label>
+            <input type="text" id="creditCardNumber" name="creditCardNumber" required><br><br>
 
-        <label for="lastName">Last Name:</label>
-        <input type="text" id="lastName" name="lastName" required><br><br>
+            <label for="expirationDate">Expiration Date:</label>
+            <input type="text" id="expirationDate" name="expirationDate" required><br><br>
 
-        <label for="creditCardNumber">Credit Card Number:</label>
-        <input type="text" id="creditCardNumber" name="creditCardNumber" required><br><br>
+            <input type="submit" value="Place Order" class="submit-btn">
+        </form>
 
-        <label for="expirationDate">Expiration Date:</label>
-        <input type="text" id="expirationDate" name="expirationDate" required><br><br>
-
-        <input type="submit" value="Place Order">
-    </form>
-
-    <p id="errorMessage" style="color: red;"></p>
+        <p id="errorMessage" class="error-message"></p>
+    </div>
 
     <script>
         // Function to get URL parameter by name
