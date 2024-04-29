@@ -40,13 +40,15 @@ public class paymentservlet extends HttpServlet {
             session.setAttribute("expirationDate", expirationDate);
             session.setAttribute("totalPrice", totalPrice);
 
-            // Record the transaction in the "sales" table
-            // recordSale(session);
+            // Record the transaction in the "sales" table and get the generated sale ID
+            int saleId = recordSale(session);
 
-            response.sendRedirect("paymentconfirmation.html"); // Redirect to payment confirmation page
+            // Set the sale ID as a session attribute
+            session.setAttribute("saleId", saleId);
+
+            String priceUrl = "paymentconfirmation.html?totalprice=" + totalPrice + "&saleid=" + saleId;
+            response.sendRedirect(priceUrl);
         } else {
-            // If credit card is not valid, redirect back to payment page with an error
-            // message
             String errorUrl = "payment.html?error=invalid_credit_card&totalprice=" + totalPrice;
             response.sendRedirect(errorUrl);
         }
@@ -92,14 +94,15 @@ public class paymentservlet extends HttpServlet {
         return isValid;
     }
 
-    // Method to record the transaction in the "sales" table
-    // Method to record the transaction in the "sales" table
-    private void recordSale(HttpSession session) {
+    private int recordSale(HttpSession session) {
+        int saleId = -1; // Initialize saleId to a default value
         String firstName = (String) session.getAttribute("firstName");
         String lastName = (String) session.getAttribute("lastName");
         String creditCardNumber = (String) session.getAttribute("creditCardNumber");
         String expirationDate = (String) session.getAttribute("expirationDate");
         double totalPrice = (Double) session.getAttribute("totalPrice");
+        String customeremail = (String) session.getAttribute("email");
+        System.out.println(customeremail);
 
         Connection conn = null;
         PreparedStatement stmt = null;
@@ -109,30 +112,40 @@ public class paymentservlet extends HttpServlet {
             conn = dataSource.getConnection();
 
             // Query to retrieve customer ID based on credit card details
-            String customerIdQuery = "SELECT id FROM customers WHERE ccId = ? AND firstName = ? AND lastName = ?";
+            String customerIdQuery = "SELECT id FROM customers WHERE email=?";
             stmt = conn.prepareStatement(customerIdQuery);
-            stmt.setString(1, creditCardNumber);
-            stmt.setString(2, firstName);
-            stmt.setString(3, lastName);
+            stmt.setString(1, customeremail);
+            System.out.println("Executing SQL 1query: " + stmt);
             rs = stmt.executeQuery();
-
-            // If customer ID is found, insert the sale record
+            // If customer ID is found, insert the sale record and retrieve the generated
+            // sale ID
             if (rs.next()) {
                 int customerId = rs.getInt("id");
+                System.out.println("printing this id here" + customerId);
 
                 // Insert sale record into the sales table
                 String query = "INSERT INTO sales (customerId, movieId, saleDate) VALUES (?, ?, ?)";
-                stmt = conn.prepareStatement(query);
+                System.out.println("Executing SQL query3: " + query); // Log the SQL query
+                stmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
                 stmt.setInt(1, customerId);
-                stmt.setString(2, "12345"); // Assuming a static movie ID for simplicity
+                stmt.setString(2, "tt0304600"); // Assuming a static movie ID for simplicity
 
                 // Get the current date
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                 Date date = new Date();
                 stmt.setString(3, sdf.format(date));
-
                 // Execute the insertion query
-                stmt.executeUpdate();
+                int affectedRows = stmt.executeUpdate();
+
+                // Retrieve the generated sale ID
+                if (affectedRows > 0) {
+                    rs = stmt.getGeneratedKeys();
+                    System.out.println("It is here saleid");
+                    if (rs.next()) {
+                        saleId = rs.getInt(1);
+                        System.out.println("It is here saleid:" + saleId);
+                    }
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -151,6 +164,8 @@ public class paymentservlet extends HttpServlet {
                 e.printStackTrace();
             }
         }
+
+        return saleId;
     }
 
 }
