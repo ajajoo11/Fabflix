@@ -1,18 +1,25 @@
 html {
-    background-image: url("https://repository-images.githubusercontent.com/299409710/b42f7780-0fe1-11eb-8460-e459acd20fb4"); /* Replace 'your-image-url.jpg' with the URL or path to your background image */
-    background-size: auto; /* Cover the entire background */
+    background-image: url("https://repository-images.githubusercontent.com/299409710/b42f7780-0fe1-11eb-8460-e459acd20fb4");
+    /* Replace 'your-image-url.jpg' with the URL or path to your background image */
+    background-size: auto;
+    /* Cover the entire background */
     background-position: center;
     margin: 0;
     padding: 0;
 }
 
 body {
-    margin-top: 30px; /* Adjust the value as needed */
+    margin-top: 30px;
+    /* Adjust the value as needed */
     font-family: Arial, sans-serif;
-    background-image: url("https://repository-images.githubusercontent.com/299409710/b42f7780-0fe1-11eb-8460-e459acd20fb4"); /* Replace 'your-image-url.jpg' with the URL or path to your background image */
-    background-size: auto; /* Cover the entire background */
-    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
-    color: #fff; /* Default text color for all elements */
+    background-image: url("https://repository-images.githubusercontent.com/299409710/b42f7780-0fe1-11eb-8460-e459acd20fb4");
+    /* Replace 'your-image-url.jpg' with the URL or path to your background image */
+    background-size: auto;
+    /* Cover the entire background */
+    background-color: rgba(0, 0, 0, 0.5);
+    /* Semi-transparent black background */
+    color: #fff;
+    /* Default text color for all elements */
 }
 
 .form-check-label,
@@ -21,12 +28,15 @@ body {
 .list-group {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center; /* Center the list items horizontally */
+    justify-content: center;
+    /* Center the list items horizontally */
 }
 
 .list-group-item {
-    flex: 0 0 calc(33.33% - 20px); /* Adjust the width of list items */
-    margin-bottom: 20px; /* Add margin between items */
+    flex: 0 0 calc(33.33% - 20px);
+    /* Adjust the width of list items */
+    margin-bottom: 20px;
+    /* Add margin between items */
     background-color: transparent;
     border: none;
     color: #fff;
@@ -42,16 +52,19 @@ body {
 
 
 a {
-    color: #fff; /* Links will have white color */
+    color: #fff;
+    /* Links will have white color */
     text-decoration: none;
 }
 
 a:hover {
-    color: #ccc; /* Change link color on hover */
+    color: #ccc;
+    /* Change link color on hover */
 }
 
 #searchInput {
-    background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent background for better visibility */
+    background-color: rgba(255, 255, 255, 0.8);
+    /* Semi-transparent background for better visibility */
     border-radius: 4px;
     padding: 8px;
     margin-right: 8px;
@@ -82,20 +95,29 @@ h3,
 h4,
 h5,
 h6 {
-    color: #fff; /* Change heading text color to white */
+    color: #fff;
+    /* Change heading text color to white */
 }
+
 /* Define a custom font family */
 @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
 
 /* Apply the custom font to the headings */
-h1, h2 {
+h1,
+h2 {
     font-family: 'Roboto', sans-serif;
-    font-size: 32px; /* Increase the font size */
-    font-weight: bold; /* Make the font bold */
-    color: #fff; /* Text color */
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Add text shadow for better visibility */
-    letter-spacing: 1px; /* Add letter spacing */
-    margin-bottom: 20px; /* Add margin at the bottom */
+    font-size: 32px;
+    /* Increase the font size */
+    font-weight: bold;
+    /* Make the font bold */
+    color: #fff;
+    /* Text color */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    /* Add text shadow for better visibility */
+    letter-spacing: 1px;
+    /* Add letter spacing */
+    margin-bottom: 20px;
+    /* Add margin at the bottom */
 }
 
 

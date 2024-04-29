@@ -27,6 +27,37 @@
 
     <script>
         $(document).ready(function () {
+            // Event listener for Add to Cart button clicks
+            $(document).on('click', '.add-to-cart-btn', function () {
+                var movieId = $(this).data('movie-id');
+                var movieTitle = $(this).data('movie-title'); // Retrieve movie title from data attribute
+                addToCart(movieId, movieTitle);
+            });
+
+            // Function to add movie to the cart
+            function addToCart(movieId, movieTitle) {
+                console.log('Adding movie to cart:', movieId, movieTitle); // Debug statement
+                $.ajax({
+                    url: 'addToCart',
+                    method: 'POST',
+                    data: {
+                        movieId: movieId,
+                        movieTitle: movieTitle // Pass movieTitle as a parameter in the AJAX request
+                    },
+                    dataType: 'json',
+                    success: function (response) {
+                        console.log('Add to cart success:', response); // Debug statement
+                        alert('Movie added to cart successfully!');
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Add to cart error:', status, error); // Debug statement
+                        alert('Failed to add movie to cart. Please try again later.');
+                    }
+                });
+            }
+
+        });
+        $(document).ready(function () {
 
             function getParameterByName(name, url) {
                 if (!url) url = window.location.href;
@@ -52,7 +83,6 @@
                 return genreLinks;
             }
 
-
             function fetchMovieDetails() {
                 var id = getParameterByName('id');
                 $.ajax({
@@ -65,7 +95,9 @@
                             '<p><strong>Director:</strong> ' + data.director + '</p>' +
                             '<p><strong>Genres:</strong> ' + createGenreLinks(data.genres) + '</p>' +
                             '<p><strong>Stars:</strong> ' + createStarLinks(data.stars) + '</p>' +
-                            '<p><strong>Rating:</strong> ' + data.rating + '</p>';
+                            '<p><strong>Rating:</strong> ' + data.rating + '</p>' +
+                            '<button class="btn btn-primary add-to-cart-btn" data-movie-id="' + data.id + '" data-movie-title="' + data.title + '">Add to Cart</button>' +
+                            '<a href="shoppingcart.html" class="btn btn-primary ml-2">View Cart</a>'; // Added "View Cart" button
                         $('#movie_details').html(movieDetailsHtml);
                     },
                     error: function (xhr, status, error) {
@@ -74,7 +106,6 @@
                     }
                 });
             }
-
 
             fetchMovieDetails();
         });
