@@ -12,6 +12,9 @@
 </head>
 
 <body>
+    <a id="backToMovieListBtn" class="btn btn-secondary"
+        href="/Fabflix/moviespage.html?title=love&sort_option=rating_asc_title_desc&pageSize=25&pageNumber=3">Back to
+        Movie List</a>
 
     <div class="container">
         <h1 class="text-center mt-4 mb-5">Single Star</h1>
@@ -32,6 +35,34 @@
 
     <script>
         $(document).ready(function () {
+
+            $(document).ready(function () {
+                // Enable/disable back button based on URL parameters
+                var urlParams = new URLSearchParams(window.location.search);
+                var genreId = urlParams.get('id');
+                var sortOption = urlParams.get('sort_option');
+                var pageSize = urlParams.get('pageSize');
+                var pageNumber = urlParams.get('pageNumber');
+
+                if (genreId) {
+                    $('#backToMovieListBtn').removeAttr('disabled');
+                }
+
+                // Event listener for back button click
+                $('#backToMovieListBtn').click(function () {
+                    // Debug statement to print the current URL parameters
+                    console.log('Current URL parameters:', window.location.search);
+
+                    // Navigate back to Movie List Page
+                    var redirectUrl = 'moviespage.html?id=' + encodeURIComponent(genreId) +
+                        '&sort_option=' + sortOption +
+                        '&pageSize=' + pageSize +
+                        '&pageNumber=' + pageNumber;
+                    redirectUrl = "/Fabflix/moviespage.html?title=love&sort_option=rating_asc_title_desc&pageSize=25&pageNumber=3"
+                    console.log('Redirecting to:', redirectUrl); // Debug statement to print the redirection URL
+                    window.location.href = redirectUrl;
+                });
+            });
 
             function getParameterByName(name, url) {
                 if (!url) url = window.location.href;

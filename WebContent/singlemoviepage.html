@@ -13,6 +13,11 @@
 
 <body>
 
+    <!--<a id="backToMovieListBtn" class="btn btn-secondary ml-2" href="singlegenrepage.html?id=<%= genreId %>&page=<%= pageNumber %>">Back to Movie List</a>-->
+    <!--<a id="backToMovieListBtn" class="btn btn-secondary ml-2" href="singlegenrepage.html?id=<%= genreId %>">Back to Movie List</a>-->
+    <a id="backToMovieListBtn" class="btn btn-secondary"
+        href="/Fabflix/moviespage.html?title=love&sort_option=rating_asc_title_desc&pageSize=25&pageNumber=3">Back to
+        Movie List</a>
     <div class="container">
         <h1 class="text-center mt-4 mb-5">Single Movie</h1>
 
@@ -55,6 +60,55 @@
                     }
                 });
             }
+
+            $(document).ready(function () {
+                // Enable/disable back button based on URL parameters
+                var urlParams = new URLSearchParams(window.location.search);
+                var genreId = urlParams.get('id');
+                var sortOption = urlParams.get('sort_option');
+                var pageSize = urlParams.get('pageSize');
+                var pageNumber = urlParams.get('pageNumber');
+
+                if (genreId) {
+                    $('#backToMovieListBtn').removeAttr('disabled');
+                }
+
+                // Event listener for back button click
+                $('#backToMovieListBtn').click(function () {
+                    // Debug statement to print the current URL parameters
+                    console.log('Current URL parameters:', window.location.search);
+
+                    // Navigate back to Movie List Page
+                    var redirectUrl = 'moviespage.html?id=' + encodeURIComponent(genreId) +
+                        '&sort_option=' + sortOption +
+                        '&pageSize=' + pageSize +
+                        '&pageNumber=' + pageNumber;
+                    redirectUrl = "/Fabflix/moviespage.html?title=love&sort_option=rating_asc_title_desc&pageSize=25&pageNumber=3"
+                    console.log('Redirecting to:', redirectUrl); // Debug statement to print the redirection URL
+                    window.location.href = redirectUrl;
+                });
+            });
+
+
+
+            // $(document).on('click', '#backToMovieListBtn', function () {
+            //     var urlParams = new URLSearchParams(window.location.search);
+            //     var genreId = urlParams.get('id');
+            //     var pageNumber = urlParams.get('page');
+            //
+            //     // Debug statements to print genreId and pageNumber
+            //     console.log('Genre ID:', genreId);
+            //     console.log('Page Number:', pageNumber);
+            //
+            //     var redirectUrl = 'singlegenrepage.html?id=' + genreId + '&page=' + pageNumber;
+            //
+            //     // Set the href attribute of the button
+            //     $('#backToMovieListBtn').attr('href', redirectUrl);
+            //
+            //     // Redirect to the new URL
+            //     window.location.href = redirectUrl;
+            // });
+
 
         });
         $(document).ready(function () {

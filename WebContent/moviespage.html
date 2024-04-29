@@ -47,6 +47,9 @@
                 <button class="btn btn-primary" id="prev_btn">Previous</button>
                 <button class="btn btn-primary ml-2" id="next_btn">Next</button>
             </div>
+            <!--            <div class="col-md-12">-->
+            <!--                <button id="backToMovieListBtn" class="btn btn-secondary" disabled>Back to Movie List</button>-->
+            <!--            </div>-->
             <div class="container mt-3">
                 <a href="shoppingcart.html" class="btn btn-primary">View Cart</a>
             </div>
@@ -217,6 +220,9 @@
                         pageNumber = 1; // Reset page number to 1 when sorting or page size is changed
                         pageSize = parseInt($('#page_size').val());
                         fetchSearchResults(); // Fetch search results with updated parameters
+
+                        // Update URL with parameters
+                        updateURL();
                     });
 
                     // Event listeners for Previous and Next buttons
@@ -225,12 +231,42 @@
                             pageNumber--;
                             fetchSearchResults(); // Fetch search results with updated page number
                         }
+
+                        // Update URL with parameters
+                        updateURL();
                     });
 
                     $('#next_btn').click(function () {
                         pageNumber++;
                         fetchSearchResults(); // Fetch search results with updated page number
+
+                        // Update URL with parameters
+                        updateURL();
                     });
+
+                    // Function to update URL with parameters
+                    // Function to update URL with parameters
+                    function updateURL() {
+                        var newURL = window.location.pathname + '?'; // Get the current URL path
+
+                        // Add search criteria to the new URL
+                        newURL += 'title=' + encodeURIComponent(getUrlParameter('title')) + '&';
+                        newURL += 'director=' + encodeURIComponent(getUrlParameter('director')) + '&';
+                        newURL += 'year=' + encodeURIComponent(getUrlParameter('year')) + '&';
+                        newURL += 'star=' + encodeURIComponent(getUrlParameter('star')) + '&';
+
+                        // Add sorting and pagination parameters to the URL
+                        newURL += 'sort_option=' + encodeURIComponent($('#sort_option').val()) + '&';
+                        newURL += 'page_size=' + encodeURIComponent($('#page_size').val()) + '&';
+                        newURL += 'page_number=' + encodeURIComponent(pageNumber);
+
+                        // Update the URL without reloading the page
+                        history.pushState({}, '', newURL);
+
+                        // Log the updated URL
+                        console.log('Updated URL:', newURL);
+                    }
+
 
                     // Fetch search results with default parameters and sorting on page load
                     fetchSearchResults();
@@ -245,7 +281,12 @@
                         var genreId = urlParams.get('id');
                         var sortOption = $('#sort_option').val();
                         var pageSize = $('#page_size').val();
+                        // var encodedGenreId = encodeURIComponent(genreId);
+                        // var sortOption = $('#sort_option').val();
+                        // var pageSize = $('#page_size').val();
                         // var pageNumber = $('#page_number').val() || 1;
+                        // var currentPage = pageNumber > 1 ? '&page=' + pageNumber : ''; // Check if page number is greater than 1
+                        // var url = 'singlegenrepage?id=' + encodedGenreId + '&sort_option=' + sortOption + '&pageSize=' + pageSize + currentPage;
 
                         $.ajax({
                             url: 'singlegenrepage?id=' + genreId + '&sort_option=' + sortOption + '&pageSize=' + pageSize + '&pageNumber=' + pageNumber,
@@ -288,7 +329,7 @@
                                     cardBody.append(starPara, rating);
 
                                     // Add "Add to Cart" button here
-                                    var addToCartBtn = $("<button class='btn btn-primary add-to-cart-btn' data-movie-id='"  + movie.id + "' data-movie-title='" + movie.title +"'>Add to Cart</button>");
+                                    var addToCartBtn = $("<button class='btn btn-primary add-to-cart-btn' data-movie-id='" + movie.id + "' data-movie-title='" + movie.title + "'>Add to Cart</button>");
                                     cardBody.append(addToCartBtn);
 
                                     card.append(cardBody);
@@ -399,7 +440,7 @@
                                 cardBody.append(starPara, rating);
 
                                 // Add "Add to Cart" button here
-                                var addToCartBtn = $("<button class='btn btn-primary add-to-cart-btn' data-movie-id='"  + movie.id + "' data-movie-title='" + movie.title +"'>Add to Cart</button>");
+                                var addToCartBtn = $("<button class='btn btn-primary add-to-cart-btn' data-movie-id='" + movie.id + "' data-movie-title='" + movie.title + "'>Add to Cart</button>");
                                 cardBody.append(addToCartBtn);
 
                                 card.append(cardBody);
@@ -444,6 +485,22 @@
                     fetchMoviesByCharacter();
                 });
             }
+        });
+
+        $(document).ready(function () {
+            // Enable/disable back button based on URL parameters
+            var urlParams = new URLSearchParams(window.location.search);
+            var genreId = urlParams.get('id');
+
+            if (genreId) {
+                $('#backToMovieListBtn').removeAttr('disabled');
+            }
+
+            // Event listener for back button click
+            $('#backToMovieListBtn').click(function () {
+                // Navigate back to Movie List Page
+                window.location.href = 'moviespage.html?id=' + encodeURIComponent(genreId);
+            });
         });
     </script>
 </body>
