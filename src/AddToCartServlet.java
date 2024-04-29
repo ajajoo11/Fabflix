@@ -5,6 +5,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Map;
+
+import com.google.gson.JsonObject;
+
 import java.util.HashMap;
 
 @WebServlet(name = "AddToCartServlet", urlPatterns = "/addToCart")
@@ -37,6 +40,7 @@ public class AddToCartServlet extends HttpServlet {
             // If the movie already exists, update the quantity
             int existingQuantity = cart.get(movieTitle);
             cart.put(movieTitle, existingQuantity + quantity);
+
         } else {
             // If the movie doesn't exist, add it to the cart
             cart.put(movieTitle, quantity);
