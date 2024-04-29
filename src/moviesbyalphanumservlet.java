@@ -39,18 +39,16 @@ public class moviesbyalphanumservlet extends HttpServlet {
 
         String character = request.getParameter("charac");
         String sortOption = request.getParameter("sort_option");
-        int pageSize = 10; // Default page size
-        int pageNumber = 1; // Default page number
+        int pageSize = 10;
+        int pageNumber = 1;
 
         String pageSizeParam = request.getParameter("pageSize");
         String pageNumberParam = request.getParameter("pageNumber");
 
-        // Check if pageSize parameter is provided and parse it
         if (pageSizeParam != null) {
             pageSize = Integer.parseInt(pageSizeParam);
         }
 
-        // Check if pageNumber parameter is provided and parse it
         if (pageNumberParam != null) {
             pageNumber = Integer.parseInt(pageNumberParam);
         }
@@ -90,7 +88,6 @@ public class moviesbyalphanumservlet extends HttpServlet {
                 }
                 jsonObject.add("genres", genresArray);
 
-                // Retrieve stars
                 String starsString = rs.getString("stars");
                 List<JsonObject> starsList = new ArrayList<>();
                 if (starsString != null) {
@@ -112,7 +109,6 @@ public class moviesbyalphanumservlet extends HttpServlet {
                         if (movieCountComparison != 0) {
                             return movieCountComparison;
                         }
-                        // If movie counts are equal, compare alphabetically
                         return star1.get("name").getAsString().compareTo(star2.get("name").getAsString());
                     }
                 });
@@ -124,7 +120,7 @@ public class moviesbyalphanumservlet extends HttpServlet {
                         starsArray.add(star);
                         count++;
                     } else {
-                        break; // Exit loop once three stars are added
+                        break;
                     }
                 }
                 jsonObject.add("stars", starsArray);
@@ -152,7 +148,6 @@ public class moviesbyalphanumservlet extends HttpServlet {
         String query;
         String orderBy;
 
-        // Determine the sorting order based on the selected sort option
         if (sortOption != null) {
             switch (sortOption) {
                 case "title_asc_rating_desc":
@@ -180,11 +175,11 @@ public class moviesbyalphanumservlet extends HttpServlet {
                     orderBy = "ORDER BY r.rating DESC, m.title ASC";
                     break;
                 default:
-                    orderBy = "ORDER BY m.title ASC, r.rating DESC"; // Default sorting
+                    orderBy = "ORDER BY m.title ASC, r.rating DESC";
                     break;
             }
         } else {
-            // Default sorting
+
             orderBy = "ORDER BY m.title ASC, r.rating DESC";
         }
 
@@ -217,10 +212,8 @@ public class moviesbyalphanumservlet extends HttpServlet {
                     + orderBy;
         }
 
-        // Calculate offset based on page size and page number
         int offset = (pageNumber - 1) * pageSize;
 
-        // Modify the query to include pagination
         query += " LIMIT ? OFFSET ?";
 
         PreparedStatement pstmt = conn.prepareStatement(query);

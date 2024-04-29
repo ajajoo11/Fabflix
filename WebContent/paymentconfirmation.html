@@ -37,20 +37,15 @@
         <p>Your payment has been successfully processed.</p>
         <p>Thank you for your purchase!</p>
         <div id="orderDetails">
-            <!-- Order details will be dynamically inserted here -->
         </div>
-        <!-- Display sale ID here -->
         <div id="saleId"></div>
-
-        <div id="totalPrice"></div> <!-- Display total price here -->
+        <div id="totalPrice"></div>
     </div>
 
-    <!-- Include jQuery -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
     <script>
         $(document).ready(function () {
-            // Extract totalprice from URL
             var totalPrice = getUrlParameter('totalprice');
             $('#totalPrice').text('Total Price: $' + totalPrice);
 
@@ -58,8 +53,6 @@
             $('#saleId').text('Sale ID:' + saleid1);
 
 
-
-            // Make AJAX call to retrieve order details
             $.ajax({
                 url: "cart",
                 type: "GET",
@@ -72,7 +65,6 @@
                 }
             });
 
-            // Function to extract query parameters from URL
             function getUrlParameter(name) {
                 name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
                 var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
@@ -80,7 +72,6 @@
                 return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
             }
 
-            // Function to display order details
             function displayOrderDetails(orderDetails, saleId) {
                 var orderDetailsHTML = '<h2>Order Details</h2>';
                 orderDetailsHTML += '<ul>';

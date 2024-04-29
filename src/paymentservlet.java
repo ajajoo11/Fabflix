@@ -95,7 +95,7 @@ public class paymentservlet extends HttpServlet {
     }
 
     private int recordSale(HttpSession session) {
-        int saleId = -1; // Initialize saleId to a default value
+        int saleId = -1;
         String firstName = (String) session.getAttribute("firstName");
         String lastName = (String) session.getAttribute("lastName");
         String creditCardNumber = (String) session.getAttribute("creditCardNumber");
@@ -110,34 +110,26 @@ public class paymentservlet extends HttpServlet {
 
         try {
             conn = dataSource.getConnection();
-
-            // Query to retrieve customer ID based on credit card details
             String customerIdQuery = "SELECT id FROM customers WHERE email=?";
             stmt = conn.prepareStatement(customerIdQuery);
             stmt.setString(1, customeremail);
             System.out.println("Executing SQL 1query: " + stmt);
             rs = stmt.executeQuery();
-            // If customer ID is found, insert the sale record and retrieve the generated
-            // sale ID
             if (rs.next()) {
                 int customerId = rs.getInt("id");
                 System.out.println("printing this id here" + customerId);
 
-                // Insert sale record into the sales table
                 String query = "INSERT INTO sales (customerId, movieId, saleDate) VALUES (?, ?, ?)";
-                System.out.println("Executing SQL query3: " + query); // Log the SQL query
+                System.out.println("Executing SQL query3: " + query);
                 stmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
                 stmt.setInt(1, customerId);
-                stmt.setString(2, "tt0304600"); // Assuming a static movie ID for simplicity
+                stmt.setString(2, "tt0304600");
 
-                // Get the current date
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                 Date date = new Date();
                 stmt.setString(3, sdf.format(date));
-                // Execute the insertion query
                 int affectedRows = stmt.executeUpdate();
 
-                // Retrieve the generated sale ID
                 if (affectedRows > 0) {
                     rs = stmt.getGeneratedKeys();
                     System.out.println("It is here saleid");

@@ -35,7 +35,7 @@ public class LoginServlet extends HttpServlet {
 
         String email = request.getParameter("email");
         String password = request.getParameter("password");
-        System.out.println("Authenticating user: " + email); // Debug print
+        System.out.println("Authenticating user: " + email);
 
         boolean isValidUser = false;
 
@@ -47,26 +47,25 @@ public class LoginServlet extends HttpServlet {
             ResultSet rs = statement.executeQuery();
 
             if (rs.next()) {
-                // User email exists, check password
+
                 if (Objects.equals(rs.getString("password"), password)) {
-                    // Password is correct, redirect to home page
+
                     isValidUser = true;
                     HttpSession session = request.getSession(true);
-                    session.setAttribute("email", email); // Set session attribute
-                    System.out.println("User logged in successfully. Email: " + email); // Debug print
+                    session.setAttribute("email", email);
+                    System.out.println("User logged in successfully. Email: " + email);
                     response.sendRedirect("/Fabflix/searchandbrowsepage.html");
-                    return; // Stop further execution
+                    return;
                 } else {
-                    // Password is incorrect, show password error message
+
                     String errorMessage = "Invalid password. Please try again.";
                     response.sendRedirect("/Fabflix/login.html?message=" + errorMessage);
-                    return; // Stop further execution
+                    return;
                 }
             } else {
-                // User email doesn't exist, show email error message
                 String errorMessage = "Invalid email. Please try again.";
                 response.sendRedirect("/Fabflix/login.html?message=" + errorMessage);
-                return; // Stop further execution
+                return;
             }
 
             // rs.close();
