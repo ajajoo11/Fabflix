@@ -38,11 +38,10 @@ public class LoginServlet extends HttpServlet {
         System.out.println("Authenticating user: " + email); // Debug print
 
         boolean isValidUser = false;
-        HttpSession session = request.getSession();
 
         try (Connection dbCon = dataSource.getConnection();
-             PreparedStatement statement = dbCon
-                     .prepareStatement("SELECT * FROM customers WHERE email = ?")) {
+                PreparedStatement statement = dbCon
+                        .prepareStatement("SELECT * FROM customers WHERE email = ?")) {
 
             statement.setString(1, email);
             ResultSet rs = statement.executeQuery();
@@ -52,19 +51,25 @@ public class LoginServlet extends HttpServlet {
                 if (Objects.equals(rs.getString("password"), password)) {
                     // Password is correct, redirect to home page
                     isValidUser = true;
+                    HttpSession session = request.getSession(true);
+                    session.setAttribute("email", email); // Set session attribute
+                    System.out.println("User logged in successfully. Email: " + email); // Debug print
                     response.sendRedirect("/Fabflix/searchandbrowsepage.html");
+                    return; // Stop further execution
                 } else {
                     // Password is incorrect, show password error message
                     String errorMessage = "Invalid password. Please try again.";
                     response.sendRedirect("/Fabflix/login.html?message=" + errorMessage);
+                    return; // Stop further execution
                 }
             } else {
                 // User email doesn't exist, show email error message
                 String errorMessage = "Invalid email. Please try again.";
                 response.sendRedirect("/Fabflix/login.html?message=" + errorMessage);
+                return; // Stop further execution
             }
 
-            rs.close();
+            // rs.close();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -72,6 +77,5 @@ public class LoginServlet extends HttpServlet {
             return;
         }
     }
-
 
 }
