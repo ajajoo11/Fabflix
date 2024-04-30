@@ -1,7 +1,7 @@
 Team Members - Bhuvan Chandra and Ananya Jajoo
 
-Video URL - [https://youtu.be/v9srqGTbPfw](https://youtu.be/s9LK3clstUo)
-Project 2 link - https://youtu.be/s9LK3clstUo
+Video URL - Project 1 - https://youtu.be/v9srqGTbPfw
+Project 2 - https://youtu.be/gfyWOM3IWo0 
 
 Bhuvan Chandra - Set up the Github structure, AWS instance, set up sql and tomcat on personal computer, coded the commands for sql database creation, worked on the code for the servlets, html, and js files.
 Ananya Jajoo - Set up SQL, Tomcat features on the AWS instance, set up sql and tomcat on personal computer created the sql database on AWS instance, worked on coding the servlets, html, and js files.
