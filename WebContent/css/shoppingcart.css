@@ -7,15 +7,20 @@ body {
     margin: 0;
     padding: 0;
     color: #fff;
+    display: flex;
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+}
+
+.container {
+    text-align: center;
 }
 
 h1, h2 {
-    text-align: center;
     color: #fff;
 }
 
 form {
-    text-align: center;
     margin-bottom: 20px;
 }
 
@@ -23,6 +28,7 @@ table {
     width: 100%;
     border-collapse: collapse;
     margin: 0 auto;
+    color: #fff;
 }
 
 table, th, td {
@@ -32,7 +38,6 @@ table, th, td {
 th, td {
     padding: 8px;
     text-align: left;
-    color: #fff;
 }
 
 tr:nth-child(even) {
@@ -49,16 +54,41 @@ a:hover {
 }
 
 /* Update the color of the buttons */
-.btn-primary, .btn-success {
+.btn {
     background-color: #e50914;
     border-color: #e50914;
+    color: #fff;
+    margin: 5px; /* Add margin for spacing */
+}
+
+/* Style the buttons on hover */
+.btn:hover {
+    background-color: #ff5252;
+    border-color: #ff5252;
 }
 
 /* Center and highlight the total price */
 #totalPrice {
-    text-align: center;
     font-weight: bold;
     font-size: 20px;
     color: #e50914;
     margin-top: 20px;
+    margin-bottom: 20px;
 }
+
+/* Update the style of the buttons */
+.btn {
+    background-color: #e50914;
+    border-color: #e50914;
+    color: #fff;
+    margin: 5px; /* Add margin for spacing */
+    padding: 10px 20px; /* Increase padding for a larger button */
+    border-radius: 8px; /* Add border-radius for rounded corners */
+}
+
+/* Style the buttons on hover */
+.btn:hover {
+    background-color: #ff5252;
+    border-color: #ff5252;
+}
+

@@ -69,3 +69,28 @@ button[type="submit"]:hover {
     margin-top: 10px;
     color: #e50914;
 }
+h2 {
+    text-align: end;
+    color: #fff;
+    margin-bottom: 30px; /* Add margin between title and form */
+    margin-right: 30px;
+    animation-name: rollIn; /* Add animation name */
+    animation-duration: 2s; /* Set animation duration */
+    animation-timing-function: ease-in-out; /* Set animation timing function */
+    animation-delay: 0.5s; /* Delay the animation */
+    animation-fill-mode: forwards; /* Maintain the final state of the animation */
+    font-weight: bold; /* Make the text more bold */
+    font-size: 24px; /* Increase font size */
+}
+
+/* Define the rollIn animation */
+@keyframes rollIn {
+    from {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
