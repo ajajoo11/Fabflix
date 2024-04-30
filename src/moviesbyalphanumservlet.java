@@ -75,6 +75,7 @@ public class moviesbyalphanumservlet extends HttpServlet {
                 jsonObject.addProperty("rating", rs.getDouble("rating"));
 
                 String genresString = rs.getString("genres");
+                System.out.println("here is the genre strings bro" + genresString);
                 JsonArray genresArray = new JsonArray();
                 if (genresString != null) {
                     String[] genres = genresString.split(",");

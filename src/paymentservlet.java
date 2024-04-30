@@ -6,7 +6,11 @@ import jakarta.servlet.http.*;
 import javax.sql.DataSource;
 import javax.naming.NamingException;
 import jakarta.servlet.annotation.WebServlet;
+
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Enumeration;
+import java.util.List;
 import java.text.SimpleDateFormat;
 
 @WebServlet(name = "paymentservlet", urlPatterns = "/payment")
@@ -41,12 +45,20 @@ public class paymentservlet extends HttpServlet {
             session.setAttribute("totalPrice", totalPrice);
 
             // Record the transaction in the "sales" table and get the generated sale ID
-            int saleId = recordSale(session);
+            List<Integer> saleIds = recordSale(session);
 
             // Set the sale ID as a session attribute
-            session.setAttribute("saleId", saleId);
+            session.setAttribute("saleId", saleIds);
 
-            String priceUrl = "paymentconfirmation.html?totalprice=" + totalPrice + "&saleid=" + saleId;
+            StringBuilder saleIdParam = new StringBuilder();
+            for (int i = 0; i < saleIds.size(); i++) {
+                if (i != 0) {
+                    saleIdParam.append(",");
+                }
+                saleIdParam.append(saleIds.get(i));
+            }
+            String priceUrl = "paymentconfirmation.html?totalprice=" + totalPrice + "&saleIds="
+                    + saleIdParam.toString();
             response.sendRedirect(priceUrl);
         } else {
             String errorUrl = "payment.html?error=invalid_credit_card&totalprice=" + totalPrice;
@@ -94,8 +106,8 @@ public class paymentservlet extends HttpServlet {
         return isValid;
     }
 
-    private int recordSale(HttpSession session) {
-        int saleId = -1;
+    private List<Integer> recordSale(HttpSession session) {
+        List<Integer> saleIds = new ArrayList<>();
         String firstName = (String) session.getAttribute("firstName");
         String lastName = (String) session.getAttribute("lastName");
         String creditCardNumber = (String) session.getAttribute("creditCardNumber");
@@ -132,10 +144,10 @@ public class paymentservlet extends HttpServlet {
 
                 if (affectedRows > 0) {
                     rs = stmt.getGeneratedKeys();
-                    System.out.println("It is here saleid");
-                    if (rs.next()) {
-                        saleId = rs.getInt(1);
-                        System.out.println("It is here saleid:" + saleId);
+                    while (rs.next()) {
+                        int saleId = rs.getInt(1);
+                        saleIds.add(saleId);
+                        System.out.println("Sale ID: " + saleId);
                     }
                 }
             }
@@ -157,7 +169,7 @@ public class paymentservlet extends HttpServlet {
             }
         }
 
-        return saleId;
+        return saleIds;
     }
 
 }
