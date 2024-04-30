@@ -6,7 +6,12 @@ import jakarta.servlet.http.*;
 import javax.sql.DataSource;
 import javax.naming.NamingException;
 import jakarta.servlet.annotation.WebServlet;
+
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Map;
 import java.text.SimpleDateFormat;
 import java.lang.Iterable;
 import java.util.Enumeration;
@@ -43,12 +48,20 @@ public class paymentservlet extends HttpServlet {
             session.setAttribute("totalPrice", totalPrice);
 
             // Record the transaction in the "sales" table and get the generated sale ID
-            int saleId = recordSale(session);
+            List<Integer> saleIds = recordSale(session);
 
             // Set the sale ID as a session attribute
-            session.setAttribute("saleId", saleId);
+            session.setAttribute("saleId", saleIds);
 
-            String priceUrl = "paymentconfirmation.html?totalprice=" + totalPrice + "&saleid=" + saleId;
+            StringBuilder saleIdParam = new StringBuilder();
+            for (int i = 0; i < saleIds.size(); i++) {
+                if (i != 0) {
+                    saleIdParam.append(",");
+                }
+                saleIdParam.append(saleIds.get(i));
+            }
+            String priceUrl = "paymentconfirmation.html?totalprice=" + totalPrice + "&saleIds="
+                    + saleIdParam.toString();
             response.sendRedirect(priceUrl);
         } else {
             String errorUrl = "payment.html?error=invalid_credit_card&totalprice=" + totalPrice;
@@ -96,18 +109,8 @@ public class paymentservlet extends HttpServlet {
         return isValid;
     }
 
-    private int recordSale(HttpSession session) {
-
-        // Print session attributes
-        System.out.println("Session Attributes:");
-        Enumeration<String> attributeNames = session.getAttributeNames();
-        while (attributeNames.hasMoreElements()) {
-            String attributeName = attributeNames.nextElement();
-            Object attributeValue = session.getAttribute(attributeName);
-            System.out.println(attributeName + ": " + attributeValue);
-        }
-
-        int saleId = -1;
+    private List<Integer> recordSale(HttpSession session) {
+        List<Integer> saleIds = new ArrayList<>();
         String firstName = (String) session.getAttribute("firstName");
         String lastName = (String) session.getAttribute("lastName");
         String creditCardNumber = (String) session.getAttribute("creditCardNumber");
@@ -120,6 +123,20 @@ public class paymentservlet extends HttpServlet {
         PreparedStatement stmt = null;
         ResultSet rs = null;
 
+        Map<String, Map.Entry<String, Integer>> cart = (Map<String, Map.Entry<String, Integer>>) session
+                .getAttribute("cart");
+
+        List<String> movieIdstodb = new ArrayList<>();
+
+        for (Map.Entry<String, Map.Entry<String, Integer>> entry : cart.entrySet()) {
+            // Extract the ID and quantity from the entry
+            String id = entry.getKey();
+            Integer quantity = entry.getValue().getValue();
+            for (int i = 0; i < quantity; i++) {
+                movieIdstodb.add(id);
+            }
+        }
+
         try {
             conn = dataSource.getConnection();
             String customerIdQuery = "SELECT id FROM customers WHERE email=?";
@@ -130,26 +147,28 @@ public class paymentservlet extends HttpServlet {
             if (rs.next()) {
                 int customerId = rs.getInt("id");
                 System.out.println("printing this id here" + customerId);
+                for (String i : movieIdstodb) {
+                    String query = "INSERT INTO sales (customerId, movieId, saleDate) VALUES (?, ?, ?)";
+                    System.out.println("Executing SQL query3: " + query);
+                    stmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+                    stmt.setInt(1, customerId);
+                    stmt.setString(2, i);
 
-                String query = "INSERT INTO sales (customerId, movieId, saleDate) VALUES (?, ?, ?)";
-                System.out.println("Executing SQL query3: " + query);
-                stmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-                stmt.setInt(1, customerId);
-                stmt.setString(2, "tt0304600");
-
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                Date date = new Date();
-                stmt.setString(3, sdf.format(date));
-                int affectedRows = stmt.executeUpdate();
-
-                if (affectedRows > 0) {
-                    rs = stmt.getGeneratedKeys();
-                    System.out.println("It is here saleid");
-                    if (rs.next()) {
-                        saleId = rs.getInt(1);
-                        System.out.println("It is here saleid:" + saleId);
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                    Date date = new Date();
+                    stmt.setString(3, sdf.format(date));
+                    int affectedRows = stmt.executeUpdate();
+                    if (affectedRows > 0) {
+                        rs = stmt.getGeneratedKeys();
+                        while (rs.next()) {
+                            int saleId = rs.getInt(1);
+                            saleIds.add(saleId);
+                            System.out.println("Sale ID: " + saleId);
+                        }
                     }
+
                 }
+
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -169,7 +188,7 @@ public class paymentservlet extends HttpServlet {
             }
         }
 
-        return saleId;
+        return saleIds;
     }
 
 }

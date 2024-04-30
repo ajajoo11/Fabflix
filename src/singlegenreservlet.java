@@ -4,7 +4,6 @@ import com.google.gson.JsonObject;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import jakarta.servlet.ServletConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -70,7 +69,7 @@ public class singlegenreservlet extends HttpServlet {
                     "LEFT JOIN genres g ON gim.genreId = g.id " +
                     "LEFT JOIN stars_in_movies sim ON m.id = sim.movieId " +
                     "LEFT JOIN stars s ON sim.starId = s.id " +
-                    "WHERE gim.genreId = ? " +
+                    "WHERE m.id IN (SELECT movieId FROM genres_in_movies WHERE genreId = ?)" +
                     "GROUP BY m.id " +
                     "ORDER BY ";
 
@@ -125,6 +124,7 @@ public class singlegenreservlet extends HttpServlet {
                         movieObject.addProperty("rating", resultSet.getFloat("rating"));
 
                         String genresString = resultSet.getString("genres");
+                        System.out.println("here is the genre strings bro" + genresString);
                         JsonArray genresArray = new JsonArray();
                         if (genresString != null) {
                             String[] genres = genresString.split(",");

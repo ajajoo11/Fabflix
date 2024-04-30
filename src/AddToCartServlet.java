@@ -28,7 +28,8 @@ public class AddToCartServlet extends HttpServlet {
         }
 
         HttpSession session = request.getSession();
-        Map<String, Map.Entry<String, Integer>> cart = (Map<String, Map.Entry<String, Integer>>) session.getAttribute("cart");
+        Map<String, Map.Entry<String, Integer>> cart = (Map<String, Map.Entry<String, Integer>>) session
+                .getAttribute("cart");
         if (cart == null) {
             cart = new HashMap<>();
             session.setAttribute("cart", cart);

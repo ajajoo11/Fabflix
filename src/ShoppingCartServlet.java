@@ -24,7 +24,6 @@ import java.util.List;
 import java.math.BigDecimal;
 import java.util.AbstractMap;
 
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -48,7 +47,8 @@ public class ShoppingCartServlet extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         HttpSession session = request.getSession();
-        Map<String, Map.Entry<String, Integer>> cart = (Map<String, Map.Entry<String, Integer>>) session.getAttribute("cart");
+        Map<String, Map.Entry<String, Integer>> cart = (Map<String, Map.Entry<String, Integer>>) session
+                .getAttribute("cart");
         JsonArray cartArray = new JsonArray();
 
         for (Map.Entry<String, Map.Entry<String, Integer>> entry : cart.entrySet()) {
@@ -75,7 +75,7 @@ public class ShoppingCartServlet extends HttpServlet {
 
     private BigDecimal getPriceFromDatabase(String title) {
         try (Connection conn = dataSource.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement("SELECT price FROM movies WHERE title = ?")) {
+                PreparedStatement pstmt = conn.prepareStatement("SELECT price FROM movies WHERE title = ?")) {
             pstmt.setString(1, title);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
@@ -93,7 +93,8 @@ public class ShoppingCartServlet extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         HttpSession session = request.getSession();
-        Map<String, Map.Entry<String, Integer>> cart = (Map<String, Map.Entry<String, Integer>>) session.getAttribute("cart");
+        Map<String, Map.Entry<String, Integer>> cart = (Map<String, Map.Entry<String, Integer>>) session
+                .getAttribute("cart");
         if (cart == null) {
             cart = new HashMap<>();
             session.setAttribute("cart", cart);
