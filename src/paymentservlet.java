@@ -8,6 +8,8 @@ import javax.naming.NamingException;
 import jakarta.servlet.annotation.WebServlet;
 import java.util.Date;
 import java.text.SimpleDateFormat;
+import java.lang.Iterable;
+import java.util.Enumeration;
 
 @WebServlet(name = "paymentservlet", urlPatterns = "/payment")
 public class paymentservlet extends HttpServlet {
@@ -95,6 +97,16 @@ public class paymentservlet extends HttpServlet {
     }
 
     private int recordSale(HttpSession session) {
+
+        // Print session attributes
+        System.out.println("Session Attributes:");
+        Enumeration<String> attributeNames = session.getAttributeNames();
+        while (attributeNames.hasMoreElements()) {
+            String attributeName = attributeNames.nextElement();
+            Object attributeValue = session.getAttribute(attributeName);
+            System.out.println(attributeName + ": " + attributeValue);
+        }
+
         int saleId = -1;
         String firstName = (String) session.getAttribute("firstName");
         String lastName = (String) session.getAttribute("lastName");
