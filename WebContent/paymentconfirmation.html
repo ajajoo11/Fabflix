@@ -8,84 +8,110 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            background-color: #000;
             margin: 0;
             padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
+            color: #fff; /* Set text color to white */
         }
 
         .container {
             text-align: center;
+            animation: fadeIn 1s ease-in; /* Add fadeIn animation */
         }
 
         h1 {
-            color: #333;
+            color: #e50914; /* Netflix red color */
+            animation: scaleIn 0.5s ease-out; /* Add scaleIn animation */
         }
 
         p {
-            color: #666;
+            color: #ccc; /* Light gray color */
+            margin-bottom: 20px; /* Add margin bottom */
+        }
+
+        #orderDetails {
+            margin-bottom: 20px; /* Add margin bottom */
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0.5);
+            }
+            to {
+                transform: scale(1);
+            }
         }
     </style>
 </head>
 
 <body>
-    <div class="container">
-        <h1>Payment Confirmed</h1>
-        <p>Your payment has been successfully processed.</p>
-        <p>Thank you for your purchase!</p>
-        <div id="orderDetails">
-        </div>
-        <div id="saleId"></div>
-        <div id="totalPrice"></div>
+<div class="container">
+    <h1>Payment Confirmed</h1>
+    <p>Your payment has been successfully processed.</p>
+    <p>Thank you for your purchase!</p>
+    <div id="orderDetails">
     </div>
+    <div id="saleId"></div>
+    <div id="totalPrice"></div>
+</div>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
-    <script>
-        $(document).ready(function () {
-            var totalPrice = getUrlParameter('totalprice');
-            $('#totalPrice').text('Total Price: $' + totalPrice);
+<script>
+    $(document).ready(function () {
+        var totalPrice = getUrlParameter('totalprice');
+        $('#totalPrice').text('Total Price: $' + totalPrice);
 
-            var saleid1 = getUrlParameter('saleIds');
-            $('#saleId').text('Sale IDs:' + saleid1);
-
-
-            $.ajax({
-                url: "cart",
-                type: "GET",
-                dataType: "json",
-                success: function (response) {
-                    displayOrderDetails(response, saleId);
-                },
-                error: function (xhr, status, error) {
-                    console.error("Error retrieving order details:", error);
-                }
-            });
-
-            function getUrlParameter(name) {
-                name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
-                var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
-                var results = regex.exec(location.search);
-                return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
-            }
-
-            function displayOrderDetails(orderDetails, saleId) {
-                var orderDetailsHTML = '<h2>Order Details</h2>';
-                orderDetailsHTML += '<ul>';
-                orderDetails.forEach(function (item) {
-                    orderDetailsHTML += '<li>' + item.title + ' - Quantity: ' + item.quantity + '</li>';
-                });
-                orderDetailsHTML += '</ul>';
-                $('#orderDetails').html(orderDetailsHTML);
+        var saleid1 = getUrlParameter('saleIds');
+        $('#saleId').text('Sale IDs:' + saleid1);
 
 
+        $.ajax({
+            url: "cart",
+            type: "GET",
+            dataType: "json",
+            success: function (response) {
+                displayOrderDetails(response, saleId);
+            },
+            error: function (xhr, status, error) {
+                console.error("Error retrieving order details:", error);
             }
         });
 
-    </script>
+        function getUrlParameter(name) {
+            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+            var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+            var results = regex.exec(location.search);
+            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+        }
+
+        function displayOrderDetails(orderDetails, saleId) {
+            var orderDetailsHTML = '<h2>Order Details</h2>';
+            orderDetailsHTML += '<ul>';
+            orderDetails.forEach(function (item) {
+                orderDetailsHTML += '<li>' + item.title + ' - Quantity: ' + item.quantity + '</li>';
+            });
+            orderDetailsHTML += '</ul>';
+            $('#orderDetails').html(orderDetailsHTML);
+
+
+        }
+    });
+
+</script>
 </body>
 
 </html>

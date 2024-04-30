@@ -30,6 +30,8 @@
         <div id="totalPrice"></div> <!-- Display total price here -->
         <button id="updateCartBtn" class="btn btn-primary">Update Cart</button>
         <button id="proceedToPaymentBtn" class="btn btn-success">Proceed to Payment</button>
+        <button id="browsePageBtn" class="btn btn-secondary">Back to Browse Page</button>
+
 
     </div>
 
@@ -79,6 +81,10 @@
                 var paymentUrl = 'payment.html?totalprice=' + calculateTotalPrice();
                 window.location.href = paymentUrl;
                 // Implement your payment logic here
+            });
+
+            $('#browsePageBtn').click(function () {
+                window.location.href = 'searchandbrowsepage.html';
             });
         });
 
