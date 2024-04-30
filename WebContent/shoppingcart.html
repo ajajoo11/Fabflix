@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shopping Cart</title>
     <!-- Include Bootstrap CSS -->
-    <!--    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">-->
+    <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"> -->
     <link rel="stylesheet" type="text/css" href="css/shoppingcart.css">
 </head>
 
@@ -47,6 +47,7 @@
                 type: "GET",
                 dataType: "json",
                 success: function (data) {
+                    console.log("Received cart data:", data);
                     // Clear previous cart items
                     $('#cartItems').empty();
                     // Generate and append new cart rows
@@ -87,53 +88,54 @@
             data.forEach(function (item) {
                 var rowtotal = item.price * item.quantity; // Calculate total price
                 rows += `
-                <tr>
-                    <td>${item.title}</td>
-                    <td>
-                        <button class="btn btn-sm btn-secondary" onclick="decreaseQuantity(this, '${item.title}')">-</button>
-                        <span class="quantity">${item.quantity}</span>
-                        <button class="btn btn-sm btn-secondary" onclick="increaseQuantity(this, '${item.title}')">+</button>
-                    </td>
-                    <td>$${item.price.toFixed(2)}</td>
-                    <td>$${rowtotal.toFixed(2)}</td> <!-- Display total price -->
-                    <td>
-                        <button class="btn btn-sm btn-danger" onclick="removeFromCart('${item.title}')">Remove</button>
-                    </td>
-                </tr>
-            `;
+                    <tr>
+                        <td>${item.title}</td>
+                        <td>
+                            <button class="btn btn-sm btn-secondary" onclick="decreaseQuantity('${item.id}', '${item.title}')">-</button>
+                            <span class="quantity">${item.quantity}</span>
+                            <button class="btn btn-sm btn-secondary" onclick="increaseQuantity('${item.id}', '${item.title}')">+</button>
+                        </td>
+                        <td>$${item.price.toFixed(2)}</td>
+                        <td>$${rowtotal.toFixed(2)}</td> <!-- Display total price -->
+                        <td>
+                            <button class="btn btn-sm btn-danger" onclick="removeFromCart('${item.id}', '${item.title}')">Remove</button>
+                        </td>
+                    </tr>
+                `;
             });
             return rows;
         }
 
         // Function to increase quantity
-        function increaseQuantity(btn, title) {
-            var quantityElement = $(btn).siblings('.quantity');
+        function increaseQuantity(id, title) {
+            var quantityElement = $('#cartItems').find('tr:contains(' + title + ')').find('.quantity');
             var quantity = parseInt(quantityElement.text());
             quantityElement.text(quantity + 1);
 
             // Call updateCart servlet to update the quantity
-            updateCart(title, quantity + 1);
+            updateCart(id, title, quantity + 1);
         }
 
         // Function to decrease quantity
-        function decreaseQuantity(btn, title) {
-            var quantityElement = $(btn).siblings('.quantity');
+        function decreaseQuantity(id, title) {
+            var quantityElement = $('#cartItems').find('tr:contains(' + title + ')').find('.quantity');
             var quantity = parseInt(quantityElement.text());
             if (quantity > 1) {
                 quantityElement.text(quantity - 1);
 
                 // Call updateCart servlet to update the quantity
-                updateCart(title, quantity - 1);
+                updateCart(id, title, quantity - 1);
             }
         }
 
         // Function to remove item from cart
-        function removeFromCart(title) {
+        function removeFromCart(id, title) {
             $.ajax({
                 url: "cart", // URL of the servlet to remove item from cart
                 type: "POST",
                 data: {
                     action: "remove",
+                    id: id,
                     title: title
                 },
                 success: function (response) {
@@ -148,12 +150,14 @@
         }
 
         // Function to update cart in the backend
-        function updateCart(title, quantity) {
+        function updateCart(id, title, quantity) {
+            console.log("Updating cart:", id, title, quantity);
             $.ajax({
                 url: "cart", // URL of the servlet to update cart
                 type: "POST",
                 data: {
                     action: "add",
+                    id: id,
                     title: title,
                     quantity: quantity
                 },
@@ -173,6 +177,7 @@
             });
             $('#totalPrice').text('Total Price: $' + totalPrice.toFixed(2));
         }
+
         function calculateTotalPrice() {
             var totalPrice = 0;
             $('#cartItems').find('tr').each(function () {

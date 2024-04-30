@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -21,7 +22,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.math.BigDecimal;
-
+import java.util.AbstractMap;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -46,46 +47,35 @@ public class ShoppingCartServlet extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         HttpSession session = request.getSession();
-        Map<String, Integer> cart = (Map<String, Integer>) session.getAttribute("cart");
-
-        // Create a JSON array to hold cart items
+        Map<String, Map.Entry<String, Integer>> cart = (Map<String, Map.Entry<String, Integer>>) session
+                .getAttribute("cart");
         JsonArray cartArray = new JsonArray();
 
-        // Iterate over each item in the cart
-        for (Map.Entry<String, Integer> entry : cart.entrySet()) {
-            String title = entry.getKey();
-            Integer quantity = entry.getValue();
+        for (Map.Entry<String, Map.Entry<String, Integer>> entry : cart.entrySet()) {
+            String id = entry.getKey();
+            String title = entry.getValue().getKey();
+            Integer quantity = entry.getValue().getValue();
 
-            // Retrieve the price of the movie from the database
             BigDecimal price = getPriceFromDatabase(title);
 
-            // Create a JSON object for each cart item
             JsonObject item = new JsonObject();
+            item.addProperty("id", id);
             item.addProperty("title", title);
             item.addProperty("quantity", quantity);
             item.addProperty("price", price); // Add the price to the JSON object
 
-            // Add the item to the cart array
             cartArray.add(item);
         }
 
-        // Set response content type
         response.setContentType("application/json");
-
-        // Get the response writer
         PrintWriter out = response.getWriter();
-
-        // Write the JSON array to the response
         out.write(new Gson().toJson(cartArray));
-
-        // Set response status
         response.setStatus(HttpServletResponse.SC_OK);
     }
 
-    // Method to retrieve price from the database based on movie title
     private BigDecimal getPriceFromDatabase(String title) {
         try (Connection conn = dataSource.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement("SELECT price FROM movies WHERE title = ?")) {
+                PreparedStatement pstmt = conn.prepareStatement("SELECT price FROM movies WHERE title = ?")) {
             pstmt.setString(1, title);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
@@ -101,29 +91,27 @@ public class ShoppingCartServlet extends HttpServlet {
         }
     }
 
-
-
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         HttpSession session = request.getSession();
-        Map<String, Integer> cart = (Map<String, Integer>) session.getAttribute("cart");
+        Map<String, Map.Entry<String, Integer>> cart = (Map<String, Map.Entry<String, Integer>>) session
+                .getAttribute("cart");
         if (cart == null) {
             cart = new HashMap<>();
+            session.setAttribute("cart", cart);
         }
 
         String action = request.getParameter("action");
         if ("add".equals(action)) {
-            // Add item to the cart
+            String movieId = request.getParameter("id");
             String movieTitle = request.getParameter("title");
             int quantity = Integer.parseInt(request.getParameter("quantity"));
-            cart.put(movieTitle, quantity);
+            cart.put(movieId, new AbstractMap.SimpleEntry<>(movieTitle, quantity));
         } else if ("remove".equals(action)) {
-            // Remove item from the cart
-            String movieTitle = request.getParameter("title");
-            cart.remove(movieTitle);
+            String movieId = request.getParameter("id");
+            cart.remove(movieId);
         }
 
         session.setAttribute("cart", cart);
-
         response.sendRedirect(request.getContextPath() + "/cart");
     }
 }
