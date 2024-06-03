@@ -38,8 +38,6 @@ Fabflix is a web application inspired by Netflix, designed to provide a seamless
    git clone https://github.com/ajajoo11/Fabflix.git
    cd Fabflix
 
-
-
 Team Members - Bhuvan Chandra and Ananya Jajoo
 
 Video URL - Project 1 - https://youtu.be/v9srqGTbPfw
