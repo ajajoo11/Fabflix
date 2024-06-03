@@ -1,3 +1,83 @@
+# Fabflix
+
+Fabflix is a web application inspired by Netflix, designed to provide a seamless movie browsing and purchasing experience for authenticated users. The application supports user authentication, movie browsing, and purchasing functionalities with a robust backend powered by MySQL. Additionally, an employee dashboard allows authorized personnel to manage the movie database efficiently.
+
+## Table of Contents
+- [Features](#features)
+- [Technologies Used](#technologies-used)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Database Schema](#database-schema)
+- [Contributing](#contributing)
+- [License](#license)
+
+## Features
+- **User Authentication:** Secure login and registration system for users.
+- **Movie Browsing:** Browse through a vast collection of movies with advanced search and filter options.
+- **Movie Purchase:** Buy movies with valid credit card information securely.
+- **Employee Dashboard:** Manage movie database with CRUD operations.
+- **Responsive Design:** User-friendly interface with responsive design for various devices.
+
+## Technologies Used
+- **Frontend:** HTML, CSS, JavaScript
+- **Backend:** Java Servlets
+- **Database:** MySQL
+- **Libraries & Frameworks:** Bootstrap, jQuery
+- **Server:** Apache Tomcat
+
+## Installation
+### Prerequisites
+- Java 8 or higher
+- Apache Tomcat 9 or higher
+- MySQL 5.7 or higher
+- Maven
+
+### Steps
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/yourusername/fabflix.git
+   cd fabflix
+# Fabflix
+
+Fabflix is a web application inspired by Netflix, designed to provide a seamless movie browsing and purchasing experience for authenticated users. The application supports user authentication, movie browsing, and purchasing functionalities with a robust backend powered by MySQL. Additionally, an employee dashboard allows authorized personnel to manage the movie database efficiently.
+
+## Table of Contents
+- [Features](#features)
+- [Technologies Used](#technologies-used)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Database Schema](#database-schema)
+- [Contributing](#contributing)
+- [License](#license)
+
+## Features
+- **User Authentication:** Secure login and registration system for users.
+- **Movie Browsing:** Browse through a vast collection of movies with advanced search and filter options.
+- **Movie Purchase:** Buy movies with valid credit card information securely.
+- **Employee Dashboard:** Manage movie database with CRUD operations.
+- **Responsive Design:** User-friendly interface with responsive design for various devices.
+
+## Technologies Used
+- **Frontend:** HTML, CSS, JavaScript
+- **Backend:** Java Servlets
+- **Database:** MySQL
+- **Libraries & Frameworks:** Bootstrap, jQuery
+- **Server:** Apache Tomcat
+
+## Installation
+### Prerequisites
+- Java 8 or higher
+- Apache Tomcat 9 or higher
+- MySQL 5.7 or higher
+- Maven
+
+### Steps
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/yourusername/fabflix.git
+   cd fabflix
+
+
 Team Members - Bhuvan Chandra and Ananya Jajoo
 
 Video URL - Project 1 - https://youtu.be/v9srqGTbPfw
